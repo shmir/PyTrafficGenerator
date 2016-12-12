@@ -52,7 +52,7 @@ def is_true(str_value):
     :returns: True if Tcl string represents True value else return False.
     """
 
-    return str_value.lower() in ('true', '1')
+    return str_value.lower() in ('true', '1', '::ixnet::ok')
 
 
 def is_false(str_value):

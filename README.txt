@@ -11,7 +11,7 @@ The package provides:
 - Base Python wrapper over Tcl - the lowest common denominator API for TGNs is Tcl (also the inheriting packages still
 	have some legacy code implemented in Tcl).    
 
-The Python wrapper over Tcl work can work on top of any Python Tcl interpreter as long as it supports some common API.
+The Python wrapper over Tcl can work on top of any Python Tcl interpreter as long as it supports some common API.
 The default Python Tcl interpreter used is Tk package but in the package there is also a sample of implementation of
 Python Tcl interpreter over console (Telnet).
 

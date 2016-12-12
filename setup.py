@@ -36,7 +36,7 @@ class PyTest(TestCommand):
 setup(
     name='trafficgenerator',
     version=trafficgenerator.__version__,
-    url='https://github.com/shmir/trafficgenerator/',
+    url='https://github.com/shmir/TrafficGenerator/',
     license='Apache Software License',
     author='Yoram Shamir',
     tests_require=['pytest'],
