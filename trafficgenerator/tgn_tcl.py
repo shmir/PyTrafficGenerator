@@ -156,11 +156,16 @@ class TgnTclWrapper(object):
         """
 
         self.logger = logger
-        logger_file_name = path.splitext(logger.handlers[0].baseFilename)[0]
-        tcl_logger_file_name = logger_file_name + '-' + self.__class__.__name__ + '.tcl'
-        self.tcl_script = logging.getLogger('tcl' + self.__class__.__name__)
-        self.tcl_script.addHandler(logging.FileHandler(tcl_logger_file_name))
-        self.tcl_script.setLevel(logger.getEffectiveLevel())
+        file_handler = None
+        for handler in logger.handlers:
+            if isinstance(handler, logging.FileHandler):
+                file_handler = handler
+        if file_handler:
+            logger_file_name = path.splitext(logger.handlers[0].baseFilename)[0]
+            tcl_logger_file_name = logger_file_name + '-' + self.__class__.__name__ + '.tcl'
+            self.tcl_script = logging.getLogger('tcl' + self.__class__.__name__)
+            self.tcl_script.addHandler(logging.FileHandler(tcl_logger_file_name))
+            self.tcl_script.setLevel(logger.getEffectiveLevel())
 
         if not tcl_interp:
             self.tcl_interp = TgnTk()
@@ -180,7 +185,8 @@ class TgnTclWrapper(object):
         :returns: command raw output.
         """
         self.logger.debug(command)
-        self.tcl_script.info(command)
+        if self.tcl_script:
+            self.tcl_script.info(command)
         self.rc = self.tcl_interp.eval(command)
         self.logger.debug('\t' + self.rc)
         return self.rc
