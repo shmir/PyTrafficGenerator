@@ -10,7 +10,7 @@ import unittest
 import logging
 from ConfigParser import SafeConfigParser
 
-from trafficgenerator.tgn_tcl import TgnTclWrapper, tcl_list_2_py_list, py_list_to_tcl_list, is_false, is_true
+from trafficgenerator.tgn_tcl import TgnTclWrapper, tcl_list_2_py_list, py_list_to_tcl_list, tcl_file_name
 
 config_file = path.join(path.dirname(__file__), 'TrafficGenerator.ini')
 
@@ -42,13 +42,6 @@ class TclTest(unittest.TestCase):
         py_list_length = len(tcl_list_2_py_list(tcl_list))
         assert(py_list_length == 2)
 
-    def testTrueFalse(self):
-        """ Test Tcl true and false values. """
+    def testFilename(self):
 
-        for false_stc in ('False', 'false', '0', 'null', 'NONE', 'none', '::ixnet::obj-null'):
-            assert(is_false(false_stc))
-            assert(not is_true(false_stc))
-
-        for true_str in ('True', 'TRUE', '1'):
-            assert(is_true(true_str))
-            assert(not is_false(true_str))
+        assert(tcl_file_name('a\\b/c').strip() == '{a/b/c}')

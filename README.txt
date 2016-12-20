@@ -19,3 +19,6 @@ Logging:
 - general messages + calls to underlining API + return values are logged to the logger provided by the application.
 	API calls are logged at debug level 
 - calls to underlining API are also logged to a separate file to create a 'script' that can be run 'as is'.
+
+Installation:
+pip instsll tgnooapi

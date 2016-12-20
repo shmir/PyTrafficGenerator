@@ -102,7 +102,10 @@ class TgnObject(object):
                     return obj
 
     def get_objects_by_type(self, *types):
-        """
+        """ Returned objects stored in memory (without re-reading them from the TGN).
+
+        Use this method for fast access to objects in case of static configurations.
+
         :param types: requested object types.
         :return: all children of the specified types.
         """
@@ -132,6 +135,8 @@ class TgnObject(object):
 
     def get_objects_or_children_by_type(self, *types):
         """ Get objects if children already been read or get children.
+
+        Use this method for fast access to objects in case of static configurations.
 
         :param types: requested object types.
         :return: all children of the specified types.

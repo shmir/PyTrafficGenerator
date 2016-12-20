@@ -46,24 +46,6 @@ def build_obj_ref_list(objects):
     return ' '.join([o.obj_ref() for o in objects])
 
 
-def is_true(str_value):
-    """
-    :param str_value: String to evaluate.
-    :returns: True if Tcl string represents True value else return False.
-    """
-
-    return str_value.lower() in ('true', '1', '::ixnet::ok')
-
-
-def is_false(str_value):
-    """
-    :param str_value: String to evaluate.
-    :returns: True if Tcl string represents False value else return True.
-    """
-
-    return str_value.lower() in ('false', '0', 'null', 'none', '::ixnet::obj-null')
-
-
 tcl_interp_g = None
 """ Global Tcl interpreter for Tcl based utilities. Does not log its operations. """
 

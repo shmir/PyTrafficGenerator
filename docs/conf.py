@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # trafficgenerator documentation build configuration file, created by
-# sphinx-quickstart on Wed Nov 23 10:18:04 2016.
+# sphinx-quickstart on Tue Dec 20 17:24:50 2016.
 #
 # This file is execfile()d with the current directory set to its
 # containing dir.
@@ -52,8 +52,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'trafficgenerator'
-copyright = u'2016, Author'
-author = u'Author'
+copyright = u'2016, yoram@ignissoft.com'
+author = u'yoram@ignissoft.com'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -180,7 +180,7 @@ html_static_path = ['_static']
 #html_show_sphinx = True
 
 # If true, "(C) Copyright ..." is shown in the HTML footer. Default is True.
-#html_show_copyright = True
+html_show_copyright = True
 
 # If true, an OpenSearch description file will be output, and all pages will
 # contain a <link> tag referring to it.  The value of this option must be the

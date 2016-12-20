@@ -34,9 +34,9 @@ class PyTest(TestCommand):
         sys.exit(errcode)
 
 setup(
-    name='trafficgenerator',
+    name='tgnooapi',
     version=trafficgenerator.__version__,
-    url='https://github.com/shmir/TrafficGenerator/',
+    url='https://github.com/shmir/PyTrafficGenerator/',
     license='Apache Software License',
     author='Yoram Shamir',
     tests_require=['pytest'],
