@@ -56,7 +56,7 @@ def tcl_list_2_py_list(tcl_list):
     :param tcl_list: string representing the Tcl string.
     :return: Python list equivalent to the Tcl list.
     """
-    return tcl_interp_g.eval('join' + tcl_str(tcl_list) + '\\t').split('\t') if tcl_list else []
+    return tcl_interp_g.eval('join' + tcl_str(tcl_list) + 'LiStSeP').split('LiStSeP') if tcl_list else []
 
 
 def py_list_to_tcl_list(py_list):
