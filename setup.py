@@ -19,7 +19,7 @@ def read(*filenames, **kwargs):
             buf.append(f.read())
     return sep.join(buf)
 
-long_description = read('README.txt', 'CHANGES.txt')
+long_description = read('README.txt')
 
 
 class PyTest(TestCommand):
@@ -45,7 +45,7 @@ setup(
     author_email='yoram@ignissoft.com',
     description='OO Python base package to automate traffic generators (Spirent TestCenter, Ixia IxNetwork etc.)',
     long_description=long_description,
-    packages=['trafficgenerator'],
+    packages=['trafficgenerator', 'trafficgenerator.test'],
     include_package_data=True,
     platforms='any',
     test_suite='trafficgenerator.test.test_tcl',
