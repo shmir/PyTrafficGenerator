@@ -1,5 +1,5 @@
 
-+++ WORK IN PROGRESS - fully functional, testing, documentation and packaging under construction. +++
++++ WORK IN PROGRESS - fully tested and functional, documentation under construction. +++
 
 TGN - Traffic Generator
 
@@ -18,7 +18,11 @@ Python Tcl interpreter over console (Telnet).
 Logging:
 - general messages + calls to underlining API + return values are logged to the logger provided by the application.
 	API calls are logged at debug level 
-- calls to underlining API are also logged to a separate file to create a 'script' that can be run 'as is'.
+- calls to underlining Tcl API are also logged to a separate file to create a native Tcl script that can be run as is.
 
 Installation:
-pip instsll tgnooapi
+stable - pip instsll tgnooapi
+testing - pip install tgnooapi -r --extra-index-url https://testpypi.python.org/pypi
+
+Contact:
+Feel free to contact me with any question or feature request at yoram@ignissoft.com

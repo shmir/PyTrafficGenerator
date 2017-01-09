@@ -61,8 +61,7 @@ class TgnObject(object):
         """
         :param types: list of requested types.
         :param level: how many levels to go down the subtree.
-        :return: all direct children of the requested types and all their descendants up to the
-            requested level.
+        :return: all direct children of the requested types and all their descendants down to the requested level.
         """
 
         if level == 0:
@@ -113,6 +112,7 @@ class TgnObject(object):
         return [o for o in self.objects.values() if o.obj_type().lower() in types_l]
 
     def get_object_by_type(self, *types):
+
         """
         :param types: requested object types.
         :return: the child of the specified types.
@@ -130,7 +130,7 @@ class TgnObject(object):
             typed_objects = []
         typed_objects += self.get_objects_by_type(*types)
         for child in self.objects.values():
-            typed_objects += child.get_objects_by_type_in_subtree(typed_objects, *types)
+            child.get_objects_by_type_in_subtree(typed_objects, *types)
         return typed_objects
 
     def get_objects_or_children_by_type(self, *types):

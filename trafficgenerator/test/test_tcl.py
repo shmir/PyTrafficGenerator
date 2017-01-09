@@ -43,5 +43,6 @@ class TclTest(unittest.TestCase):
         assert(py_list_length == 2)
 
     def testFilename(self):
+        """ Test Tcl file names normalization. """
 
         assert(tcl_file_name('a\\b/c').strip() == '{a/b/c}')
