@@ -8,7 +8,7 @@ from os import path
 import sys
 import unittest
 import logging
-from ConfigParser import SafeConfigParser
+from configparser import SafeConfigParser
 
 from trafficgenerator.tgn_utils import is_false, is_true, is_local_host, is_ip
 from trafficgenerator.tgn_object import TgnObject
@@ -36,7 +36,7 @@ class TgnTest(unittest.TestCase):
         pass
 
     def testHelloWorld(self):
-        print sys.version
+        print(sys.version)
 
 
 class TgnObjectTest(TgnTest):
@@ -81,7 +81,7 @@ class TgnObjectTest(TgnTest):
     def testLocalhost(self):
         """ Test TGN localhost values. """
 
-        for location in ('127.0.0.1', 'localhost', 'Localhost/1/1'):
+        for location in ('127.0.0.1', 'localhost', 'Localhost/1/1', '//(Offline)/1/1', 'null'):
             assert(is_local_host(location))
 
         for location in ('1.2.3.4', 'hostname', '192.168.1.1/1/2'):

@@ -44,19 +44,6 @@ class TgnObject(object):
     def __str__(self):
         return self.obj_name()
 
-    def _set_data(self, **data):
-        self._data.update(data)
-
-    def _build_children_objs(self, child_type, output):
-        children_objs = OrderedDict()
-        child_obj_type = self.get_obj_class(child_type)
-        for child in filter(None, output):
-            child_object = child_obj_type(objRef=child, objType=child_type, parent=self)
-            child_object._set_data(name=child_object.get_name())
-            children_objs[child_object.obj_ref()] = child_object
-        self.objects.update(children_objs)
-        return children_objs
-
     def get_subtree(self, types=[], level=1):
         """
         :param types: list of requested types.
@@ -95,7 +82,7 @@ class TgnObject(object):
         if self._data[key] == value:
             return self
         else:
-            for child in self.objects.itervalues():
+            for child in self.objects.values():
                 obj = child._get_object_by_key(key, value)
                 if obj is not None:
                     return obj
@@ -201,6 +188,19 @@ class TgnObject(object):
         :return: all instances of the requested class.
         """
         return list(o for o in gc.get_objects() if isinstance(o, cls))
+
+    def _set_data(self, **data):
+        self._data.update(data)
+
+    def _build_children_objs(self, child_type, output):
+        children_objs = OrderedDict()
+        child_obj_type = self.get_obj_class(child_type)
+        for child in filter(None, output):
+            child_object = child_obj_type(objRef=child, objType=child_type, parent=self)
+            child_object._set_data(name=child_object.get_name())
+            children_objs[child_object.obj_ref()] = child_object
+        self.objects.update(children_objs)
+        return children_objs
 
 
 class TgnL3(object):

@@ -7,7 +7,7 @@ Base class and utilities for TGN Python Tcl wrapper.
 from os import path
 import logging
 import re
-from Tkinter import Tk
+from tkinter import Tk
 
 
 def tcl_str(string=''):

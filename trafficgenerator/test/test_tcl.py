@@ -8,7 +8,7 @@ import sys
 from os import path
 import unittest
 import logging
-from ConfigParser import SafeConfigParser
+from configparser import SafeConfigParser
 
 from trafficgenerator.tgn_tcl import TgnTclWrapper, tcl_list_2_py_list, py_list_to_tcl_list, tcl_file_name
 
