@@ -7,7 +7,7 @@ Base class and utilities for TGN Python Tcl wrapper.
 from os import path
 import logging
 import re
-from tkinter import Tk
+from tkinter import Tk, Tcl
 
 
 def tcl_str(string=''):
@@ -72,8 +72,11 @@ def py_list_to_tcl_list(py_list):
 class TgnTk(Tk):
     """ Native Python Tk interpreter. """
 
+    def __init__(self):
+        self.tcl = Tcl()
+
     def eval(self, command):
-        return self.tk.eval(command)
+        return self.tcl.eval(command)
 
 
 class TgnTclConsole(object):

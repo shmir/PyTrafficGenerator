@@ -1,0 +1,1 @@
+Use Tcl instead of Tk in default Python wrapper over Tcl.

@@ -43,7 +43,7 @@ setup(
     install_requires=[],
     cmdclass={'test': PyTest},
     author_email='yoram@ignissoft.com',
-    description='OO Python base package to automate traffic generators (Spirent TestCenter, Ixia IxNetwork etc.)',
+    description='Base Python OO API package to automate traffic generators (Spirent TestCenter, Ixia IxNetwork etc.)',
     long_description=long_description,
     packages=['trafficgenerator', 'trafficgenerator.test'],
     include_package_data=True,
