@@ -22,7 +22,7 @@ Logging:
 
 Installation:
 stable - pip instsll tgnooapi
-testing - pip install tgnooapi -r --extra-index-url https://testpypi.python.org/pypi
+testing - pip install tgnooapi --extra-index-url https://testpypi.python.org/pypi
 
 Contact:
 Feel free to contact me with any question or feature request at yoram@ignissoft.com

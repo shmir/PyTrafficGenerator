@@ -40,7 +40,7 @@ setup(
     license='Apache Software License',
     author='Yoram Shamir',
     tests_require=['pytest'],
-    install_requires=[],
+    install_requires=['future', 'configparser'],
     cmdclass={'test': PyTest},
     author_email='yoram@ignissoft.com',
     description='Base Python OO API package to automate traffic generators (Spirent TestCenter, Ixia IxNetwork etc.)',

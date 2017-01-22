@@ -69,7 +69,7 @@ def py_list_to_tcl_list(py_list):
     return tcl_str(tcl_interp_g.eval('split' + tcl_str('\t'.join(py_list_str)) + '\\t'))
 
 
-class TgnTk(Tk):
+class TgnTk(object):
     """ Native Python Tk interpreter. """
 
     def __init__(self):
