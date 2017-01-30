@@ -6,8 +6,11 @@ Base class and utilities for TGN Python Tcl wrapper.
 
 from os import path
 import logging
+import time
 import re
-from tkinter import Tk, Tcl
+from threading import Thread
+from queue import Queue
+from tkinter import Tcl, Tk
 
 
 def tcl_str(string=''):
@@ -77,6 +80,43 @@ class TgnTk(object):
 
     def eval(self, command):
         return self.tcl.eval(command)
+
+
+class TgnTkMultithread(Thread):
+    """ Native Python Tk interpreter with multithreading. """
+
+    tcl = None
+    _is_running = True
+
+    def __init__(self):
+        super(self.__class__, self).__init__()
+        self.in_q = Queue()
+        self.out_q = Queue()
+
+    def run(self):
+        if not self.tcl:
+            self.tcl = Tk()
+        while self._is_running:
+            if not self.in_q.empty():
+                command = self.in_q.get()
+                try:
+                    rc = self.tcl.eval(command)
+                    self.out_q.put(rc)
+                except Exception as e:
+                    self.out_q.put(e)
+            time.sleep(1)
+
+    def stop(self):
+        self._is_running = False
+
+    def eval(self, command):
+        self.in_q.put(command)
+        while self.out_q.empty():
+            time.sleep(1)
+        rc = self.out_q.get()
+        if isinstance(rc, Exception):
+            raise rc
+        return rc
 
 
 class TgnTclConsole(object):
