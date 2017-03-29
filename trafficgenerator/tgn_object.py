@@ -78,12 +78,16 @@ class TgnObject(object):
         """
         return self._get_object_by_key('name', obj_name)
 
-    def _get_object_by_key(self, key, value):
-        if self._data[key] == value:
+    def _get_object_by_key(self, key, value, *types):
+        if self._data[key] == value and (types and self.obj_type() in types or not types):
             return self
         else:
-            for child in self.objects.values():
-                obj = child._get_object_by_key(key, value)
+            if not types:
+                children = self.objects.values()
+            else:
+                children = self.get_objects_by_type(*types)
+            for child in children:
+                obj = child._get_object_by_key(key, value, *types)
                 if obj is not None:
                     return obj
 
@@ -192,10 +196,10 @@ class TgnObject(object):
     def _set_data(self, **data):
         self._data.update(data)
 
-    def _build_children_objs(self, child_type, output):
+    def _build_children_objs(self, child_type, children):
         children_objs = OrderedDict()
         child_obj_type = self.get_obj_class(child_type)
-        for child in filter(None, output):
+        for child in (c for c in children if c is not ''):
             child_object = child_obj_type(objRef=child, objType=child_type, parent=self)
             child_object._set_data(name=child_object.get_name())
             children_objs[child_object.obj_ref()] = child_object
