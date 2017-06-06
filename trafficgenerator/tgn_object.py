@@ -99,6 +99,9 @@ class TgnObject(object):
         :param types: requested object types.
         :return: all children of the specified types.
         """
+
+        if not types:
+            return self.objects.values()
         types_l = [o.lower() for o in types]
         return [o for o in self.objects.values() if o.obj_type().lower() in types_l]
 
