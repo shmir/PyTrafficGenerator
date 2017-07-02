@@ -4,14 +4,18 @@ Base class and utilities for TGN Python Tcl wrapper.
 @author: yoram.shamir
 """
 
+import sys
 from os import path
 import logging
 import time
 import re
 from threading import Thread
 from queue import Queue
-from tkinter import Tcl, Tk
-
+if sys.version_info[0] < 3:
+    from Tkinter import Tcl, Tk
+else:
+    from tkinter import Tcl, Tk
+    
 
 def tcl_str(string=''):
     """
