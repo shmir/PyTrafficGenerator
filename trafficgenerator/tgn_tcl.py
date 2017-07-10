@@ -10,7 +10,7 @@ import time
 import re
 from threading import Thread
 from queue import Queue
-from tkinter import Tcl, Tk
+from tkinter import Tcl
 
 
 def tcl_str(string=''):
@@ -95,7 +95,7 @@ class TgnTkMultithread(Thread):
 
     def run(self):
         if not self.tcl:
-            self.tcl = Tk()
+            self.tcl = Tcl()
         while self._is_running:
             if not self.in_q.empty():
                 command = self.in_q.get()
