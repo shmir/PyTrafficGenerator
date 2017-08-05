@@ -1,8 +1,9 @@
+#!/usr/bin/env python
+# encoding: utf-8
+
 from __future__ import print_function
 from setuptools import setup
-from setuptools.command.test import test as TestCommand
 import io
-import sys
 
 import trafficgenerator
 

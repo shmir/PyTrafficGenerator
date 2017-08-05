@@ -45,10 +45,10 @@ class TgnObject(object):
         return self.obj_name()
 
     def get_subtree(self, types=[], level=1):
-        """
+        """ Read all direct children of the requested types and all their descendants down to the requested level.
+
         :param types: list of requested types.
         :param level: how many levels to go down the subtree.
-        :return: all direct children of the requested types and all their descendants down to the requested level.
         """
 
         if level == 0:
@@ -114,17 +114,15 @@ class TgnObject(object):
         children = self.get_objects_by_type(*types)
         return children[0] if any(children) else None
 
-    def get_objects_by_type_in_subtree(self, typed_objects=None, *types):
+    def get_objects_by_type_in_subtree(self, *types):
         """
         :param types: requested object types.
         :return: all children of the specified types.
         """
 
-        if not typed_objects:
-            typed_objects = []
-        typed_objects += self.get_objects_by_type(*types)
+        typed_objects = self.get_objects_by_type(*types)
         for child in self.objects.values():
-            child.get_objects_by_type_in_subtree(typed_objects, *types)
+            typed_objects += child.get_objects_by_type_in_subtree(*types)
         return typed_objects
 
     def get_objects_or_children_by_type(self, *types):
@@ -146,6 +144,15 @@ class TgnObject(object):
         """
         return [o for o in self.get_objects_by_type(obj_type) if
                 o.get_objects_by_type(*child_types)]
+
+    def get_objects_with_attribute(self, obj_type, attribute, value):
+        """
+        :param obj_type: requested object type.
+        :param attribute: requested attribute.
+        :param value: requested attribute value.
+        :return: all children of the requested type that have the requested attribute == requested value.
+        """
+        return [o for o in self.get_objects_by_type(obj_type) if o.get_attribute(attribute) == value]
 
     def get_ancestor_object_by_type(self, obj_type):
         """
@@ -208,6 +215,28 @@ class TgnObject(object):
             children_objs[child_object.obj_ref()] = child_object
         self.objects.update(children_objs)
         return children_objs
+
+    #
+    # Abstract API methods.
+    #
+
+    @abstractmethod
+    def get_attribute(self, attribute):
+        """ Get single attribute value.
+
+        :param attribute: attribute name.
+        :return: attribute value.
+        """
+        pass
+
+    @abstractmethod
+    def get_children(self, *types):
+        """ Get all children of the requested types.
+
+        :param attribute: requested children types.
+        :return: list of all children of the requested types.
+        """
+        pass
 
 
 class TgnL3(object):
