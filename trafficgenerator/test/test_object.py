@@ -85,7 +85,7 @@ class TgnUtilsTest(unittest.TestCase):
     def testIps(self):
         """ Test TGN IP values. """
 
-        for ip in ('IPV4', 'ipv6'):
+        for ip in ('IPV4', 'ipv6', 'ipv4if', 'IPV6IF'):
             assert(is_ip(ip))
 
         for ip in ('mac', 'bla'):

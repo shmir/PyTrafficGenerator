@@ -32,17 +32,17 @@ def is_local_host(location):
 def is_ipv4(str_value):
     """
     :param str_value: String to evaluate.
-    :returns: True if string is IPv4 else return False.
+    :returns: True if string represents IPv4 else return False.
     """
-    return str_value.lower() == 'ipv4'
+    return str_value.lower() in ('ipv4', 'ipv4if')
 
 
 def is_ipv6(str_value):
     """
     :param str_value: String to evaluate.
-    :returns: True if string is IPv6 else return False.
+    :returns: True if string represents IPv6 else return False.
     """
-    return str_value.lower() == 'ipv6'
+    return str_value.lower() in ('ipv6', 'ipv6if')
 
 
 def is_ip(str_value):
