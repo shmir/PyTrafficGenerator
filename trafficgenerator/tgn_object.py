@@ -27,12 +27,17 @@ class TgnObject(object):
         """ Create new TGN object in the API.
 
         If object does not exist on the chassis, create it on the chassis as well.
+
+        :param parent: object parent. If == None the api and logger attributes must be set explicitly by the caller.
         """
 
         super(TgnObject, self).__init__()
         self._data = {}
         self.objects = OrderedDict()
         self._set_data(**data)
+        if self._data['parent']:
+            self.api = self.obj_parent().api
+            self.logger = self.obj_parent().logger
         if 'objRef' not in self._data:
             self._data['objRef'] = self._create()
         if 'name' not in self._data:

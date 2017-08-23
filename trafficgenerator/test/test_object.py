@@ -14,7 +14,9 @@ from trafficgenerator.tgn_object import TgnObject
 class TgnObjectTest(unittest.TestCase):
 
     def setUp(self):
-        self.root = TgnObject(objRef='root1', objType='root')
+        self.root = TgnObject(objRef='root1', objType='root', parent=None)
+        self.root.api = None
+        self.root.logger = None
         self.leaf1 = TgnObject(objRef='leaf1', objType='leaf', parent=self.root)
         self.node1 = TgnObject(objRef='node1', objType='node', parent=self.root, name='name1')
         self.node2 = TgnObject(objRef='node2', objType='node', parent=self.root, name='name2')
