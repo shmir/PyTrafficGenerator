@@ -9,11 +9,13 @@ import gc
 from abc import ABCMeta, abstractmethod
 
 
-# Workaround IXN object reference bug. Sometimes IXN return object reference with float sequential
-# number instead of integer. For example, endpointset->sources attribute might return:
-# vport:1/protocols/bgp/neighborRange:1.0/routeRange:1.
+# Workaround IXN object reference bugs.
+# Object reference with float sequential number instead of integer.
+#    For example, endpointset->sources attribute might return:
+#    vport:1/protocols/bgp/neighborRange:1.0/routeRange:1.
+# Object reference with neighborPairs (plural) instead of neighborPair (single).
 def _WA_norm_obj_ref(obj_ref):
-    return obj_ref.replace('.0', '')
+    return obj_ref.replace('.0', '').replace('neighborPairs:', 'neighborPair:')
 
 
 class TgnObject(object):
