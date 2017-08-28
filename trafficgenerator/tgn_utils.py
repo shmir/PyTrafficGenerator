@@ -4,6 +4,15 @@ TGN projects utilities and errors.
 @author: yoram.shamir
 """
 
+from enum import Enum
+
+
+class ApiType(Enum):
+    tcl = 1
+    tcl_multithread = 2
+    python = 3
+    rest = 4
+
 
 def is_true(str_value):
     """

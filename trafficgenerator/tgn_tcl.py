@@ -90,13 +90,13 @@ class TgnTk(object):
 class TgnTkMultithread(Thread):
     """ Native Python Tk interpreter with multithreading. """
 
-    tcl = None
     _is_running = True
 
     def __init__(self):
         super(self.__class__, self).__init__()
         self.in_q = Queue()
         self.out_q = Queue()
+        self.tcl = None
 
     def run(self):
         if not self.tcl:
