@@ -3,3 +3,4 @@ configparser
 pytest
 pytest_runner
 mock
+enum34

@@ -152,6 +152,15 @@ class TgnObject(object):
         return [o for o in self.get_objects_by_type(obj_type) if
                 o.get_objects_by_type(*child_types)]
 
+    def get_objects_without_object(self, obj_type, *child_types):
+        """
+        :param obj_type: requested object type.
+        :param child_type: unrequested child types.
+        :return: all children of the requested type that do not have the unrequested child types.
+        """
+        return [o for o in self.get_objects_by_type(obj_type) if
+                not o.get_objects_by_type(*child_types)]
+
     def get_objects_with_attribute(self, obj_type, attribute, value):
         """
         :param obj_type: requested object type.
