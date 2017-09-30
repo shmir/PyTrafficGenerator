@@ -7,11 +7,17 @@ TGN projects utilities and errors.
 from enum import Enum
 
 
+class TgnType(Enum):
+    ixexplorer = 1
+    ixnetwork = 2
+    testcenter = 3
+
+
 class ApiType(Enum):
     tcl = 1
-    tcl_multithread = 2
-    python = 3
-    rest = 4
+    python = 2
+    rest = 3
+    socket = 4
 
 
 def is_true(str_value):

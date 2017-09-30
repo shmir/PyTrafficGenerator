@@ -1,6 +1,6 @@
 future
 configparser
 pytest
-pytest_runner
+pytest-runner
 mock
 enum34
