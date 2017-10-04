@@ -198,7 +198,7 @@ class TgnObject(object):
         """
         :return: object reference.
         """
-        return self._data['objRef']
+        return str(self._data['objRef'])
 
     def obj_type(self):
         """
