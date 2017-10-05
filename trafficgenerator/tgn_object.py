@@ -21,7 +21,6 @@ def _WA_norm_obj_ref(obj_ref):
 class TgnObject(object):
     """ Base class for all TGN classes. """
 
-    _data = {}
     objects = {}
     """ Dictionary of child objects <object reference: object name>. """
 
@@ -50,12 +49,6 @@ class TgnObject(object):
 
     def __str__(self):
         return self.obj_name()
-
-    def __del__(self):
-        # do not use 'del object', use 'object.__del__()' instead.
-        # todo: get read of cyclic ref? use weakref?
-        if self.parent:
-            self.parent.objects.pop(self.obj_ref())
 
     def get_subtree(self, types=[], level=1):
         """ Read all direct children of the requested types and all their descendants down to the requested level.
@@ -146,6 +139,7 @@ class TgnObject(object):
         :param types: requested object types.
         :return: all children of the specified types.
         """
+
         objects = self.get_objects_by_type(*types)
         return objects if objects else self.get_children(*types)
 
@@ -155,6 +149,7 @@ class TgnObject(object):
         :param child_type: requested child types.
         :return: all children of the requested type that have the requested child types.
         """
+
         return [o for o in self.get_objects_by_type(obj_type) if
                 o.get_objects_by_type(*child_types)]
 
@@ -188,6 +183,11 @@ class TgnObject(object):
             if 'parent' not in self._data:
                 return None
             return self.obj_parent().get_ancestor_object_by_type(obj_type)
+
+    def del_object_from_parent(self):
+        """ Delete object from parent object. """
+        if self.parent:
+            self.parent.objects.pop(self.obj_ref())
 
     @classmethod
     def get_objects_of_class(cls):
