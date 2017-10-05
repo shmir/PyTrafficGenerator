@@ -51,6 +51,12 @@ class TgnObject(object):
     def __str__(self):
         return self.obj_name()
 
+    def __del__(self):
+        # do not use 'del object', use 'object.__del__()' instead.
+        # todo: get read of cyclic ref? use weakref?
+        if self.parent:
+            self.parent.objects.pop(self.obj_ref())
+
     def get_subtree(self, types=[], level=1):
         """ Read all direct children of the requested types and all their descendants down to the requested level.
 
@@ -183,6 +189,13 @@ class TgnObject(object):
                 return None
             return self.obj_parent().get_ancestor_object_by_type(obj_type)
 
+    @classmethod
+    def get_objects_of_class(cls):
+        """
+        :return: all instances of the requested class.
+        """
+        return list(o for o in gc.get_objects() if isinstance(o, cls))
+
     #
     # Simple utilities to return object _data. Maybe it's not Pythonic (more like Java) but after
     # changing the key name couple of times I decided to go for it.
@@ -193,31 +206,32 @@ class TgnObject(object):
         :return: object name.
         """
         return self._data['name']
+    name = property(obj_name)
 
     def obj_ref(self):
         """
         :return: object reference.
         """
         return str(self._data['objRef'])
+    ref = property(obj_ref)
 
     def obj_type(self):
         """
         :return: object type.
         """
         return self._data['objType']
+    type = property(obj_type)
 
     def obj_parent(self):
         """
         :return: object parent.
         """
         return self._data['parent']
+    parent = property(obj_parent)
 
-    @classmethod
-    def get_objects_of_class(cls):
-        """
-        :return: all instances of the requested class.
-        """
-        return list(o for o in gc.get_objects() if isinstance(o, cls))
+    #
+    # Private methods.
+    #
 
     def _set_data(self, **data):
         self._data.update(data)
