@@ -25,7 +25,8 @@ class TgnTest(unittest.TestCase):
         TgnTest.config.read(TgnTest.config_file)
 
         TgnTest.logger.setLevel(TgnTest.config.get('Logging', 'level'))
-        TgnTest.logger.addHandler(logging.FileHandler(TgnTest.config.get('Logging', 'file_name')))
+        if TgnTest.config.get('Logging', 'file_name'):
+            TgnTest.logger.addHandler(logging.FileHandler(TgnTest.config.get('Logging', 'file_name')))
         TgnTest.logger.addHandler(logging.StreamHandler(sys.stdout))
 
     @classmethod
