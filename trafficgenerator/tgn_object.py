@@ -177,12 +177,19 @@ class TgnObject(object):
         :return: the ancestor of the object who's type is obj_type if exists else None.
         """
 
-        if self.obj_type().lower() == obj_type.lower():
+        if self.type.lower() == obj_type.lower():
             return self
         else:
-            if 'parent' not in self._data:
+            if not self.parent:
                 return None
-            return self.obj_parent().get_ancestor_object_by_type(obj_type)
+            return self.parent.get_ancestor_object_by_type(obj_type)
+
+    def get_object_from_attribute(self, attribute):
+        return self.get_objects_from_attribute(attribute)[0] if self.get_objects_from_attribute(attribute) else None
+
+    @abstractmethod
+    def get_objects_from_attribute(self, attribute):
+        pass
 
     def del_object_from_parent(self):
         """ Delete object from parent object. """

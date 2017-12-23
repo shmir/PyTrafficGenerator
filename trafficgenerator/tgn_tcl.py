@@ -12,6 +12,8 @@ import re
 from threading import Thread
 from queue import Queue
 
+from trafficgenerator.tgn_utils import new_log_file
+
 if sys.version_info[0] < 3:
     from Tkinter import Tcl
 else:
@@ -170,12 +172,6 @@ class TgnTclConsole(object):
 class TgnTclWrapper(object):
     """ Tcl connectivity for TGN projects. """
 
-    tcl_interp = None
-
-    tcl_script = None
-    logger = None
-    rc = None
-
     def __init__(self, logger, tcl_interp=None):
         """ Init Python Tk package.
 
@@ -185,17 +181,10 @@ class TgnTclWrapper(object):
         to create two distinguished Tcl scripts.
         """
 
+        if not logger:
+            logger = logging.getLogger('dummy')
         self.logger = logger
-        file_handler = None
-        for handler in logger.handlers:
-            if isinstance(handler, logging.FileHandler):
-                file_handler = handler
-        if file_handler:
-            logger_file_name = path.splitext(logger.handlers[0].baseFilename)[0]
-            tcl_logger_file_name = logger_file_name + '-' + self.__class__.__name__ + '.tcl'
-            self.tcl_script = logging.getLogger('tcl' + self.__class__.__name__)
-            self.tcl_script.addHandler(logging.FileHandler(tcl_logger_file_name, 'w'))
-            self.tcl_script.setLevel(logger.getEffectiveLevel())
+        self.tcl_script = new_log_file(self.logger, self.__class__.__name__)
 
         if not tcl_interp:
             self.tcl_interp = TgnTk()
