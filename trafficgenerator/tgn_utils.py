@@ -7,6 +7,7 @@ TGN projects utilities and errors.
 import logging
 from os import path
 from enum import Enum
+import collections
 
 
 class TgnType(Enum):
@@ -20,6 +21,13 @@ class ApiType(Enum):
     python = 2
     rest = 3
     socket = 4
+
+
+def flatten(x):
+    if isinstance(x, collections.Iterable):
+        return [a for i in x for a in flatten(i)]
+    else:
+        return [x]
 
 
 def is_true(str_value):
