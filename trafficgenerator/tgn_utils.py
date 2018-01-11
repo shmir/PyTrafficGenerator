@@ -94,10 +94,10 @@ def new_log_file(logger, suffix, file_type='tcl'):
     for handler in logger.handlers:
         if isinstance(handler, logging.FileHandler):
             file_handler = handler
+    new_logger = logging.getLogger(file_type + suffix)
     if file_handler:
         logger_file_name = path.splitext(file_handler.baseFilename)[0]
         tcl_logger_file_name = logger_file_name + '-' + suffix + '.' + file_type
-        new_logger = logging.getLogger(file_type + suffix)
         new_logger.addHandler(logging.FileHandler(tcl_logger_file_name, 'w'))
         new_logger.setLevel(logger.getEffectiveLevel())
 
