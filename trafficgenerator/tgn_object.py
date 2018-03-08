@@ -194,7 +194,14 @@ class TgnObject(object):
     def del_object_from_parent(self):
         """ Delete object from parent object. """
         if self.parent:
-            self.parent.objects.pop(self.obj_ref())
+            self.parent.objects.pop(self.ref)
+
+    def del_objects_by_type(self, type):
+        """ Delete all children objects.
+
+        :param type: type of objects to delete.
+        """
+        [o.del_object_from_parent() for o in self.get_objects_by_type(type)]
 
     @classmethod
     def get_objects_of_class(cls):

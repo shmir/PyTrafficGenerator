@@ -100,3 +100,5 @@ syntax: regexp
 ^trafficgenerator/test/logs/configs_per_protocol$
 syntax: regexp
 ^\.pydevproject$
+
+.idea
