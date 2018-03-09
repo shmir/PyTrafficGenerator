@@ -7,8 +7,8 @@ Tests for basic TGN object operations.
 import unittest
 from mock import MagicMock
 
-from trafficgenerator.tgn_utils import is_false, is_true, is_local_host, is_ip
-from trafficgenerator.tgn_object import TgnObject
+from trafficgenerator.tgn_utils import is_false, is_true, is_local_host, is_ip, flatten, TgnError
+from trafficgenerator.tgn_object import TgnObject, TgnObjectsDict
 
 
 class TgnObjectTest(unittest.TestCase):
@@ -21,6 +21,7 @@ class TgnObjectTest(unittest.TestCase):
         self.node1 = TgnObject(objRef='node1', objType='node', parent=self.root, name='name1')
         self.node2 = TgnObject(objRef='node2', objType='node', parent=self.root, name='name2')
         self.node11 = TgnObject(objRef='node11', objType='node', parent=self.node1, name='name11')
+        self.node12 = TgnObject(objRef='node12', objType='node', parent=self.node1, name='name12')
         self.leaf11 = TgnObject(objRef='leaf11', objType='leaf', parent=self.node1)
         for o in self.__dict__.values():
             if type(o) == TgnObject:
@@ -48,7 +49,7 @@ class TgnObjectTest(unittest.TestCase):
         assert(len(self.root.get_objects_by_type('no_such_object')) == 0)
         assert(self.root.get_object_by_ref('leaf1') == self.leaf1)
 
-        assert(len(self.root.get_objects_by_type_in_subtree('node')) == 3)
+        assert(len(self.root.get_objects_by_type_in_subtree('node')) == 4)
         assert(len(self.root.get_objects_by_type_in_subtree('leaf')) == 2)
         assert(len(self.node11.get_objects_by_type_in_subtree('node')) == 0)
 
@@ -60,6 +61,18 @@ class TgnObjectTest(unittest.TestCase):
         o.get_attribute = MagicMock(name='get_attribute')
         o.get_attribute('attr_name')
         o.get_attribute.return_value = o.obj_ref()
+
+    def test_objects_dict(self):
+        objects_dict = TgnObjectsDict()
+        objects_dict[self.node1] = TgnObjectsDict()
+        objects_dict[self.node1][self.node11] = 'node 11 entry'
+        objects_dict[self.node1][self.node12] = 'node 12 entry'
+        objects_dict[self.node2] = 'node 2 entry'
+        self.assertRaises(TgnError, objects_dict.__setitem__, 'invalid key', '')
+        assert(objects_dict[self.node2] == 'node 2 entry')
+        assert(objects_dict[self.node2.name] == 'node 2 entry')
+        assert(objects_dict[self.node2.ref] == 'node 2 entry')
+        print(objects_dict.dumps())
 
 
 class TgnUtilsTest(unittest.TestCase):
@@ -92,3 +105,12 @@ class TgnUtilsTest(unittest.TestCase):
 
         for ip in ('mac', 'bla'):
             assert(not is_ip(ip))
+
+    def testFlatten(self):
+        nl = [1, [11, [111]], 2, [22]]
+        assert(len(nl) == 4)
+        assert(type(nl[1]) == list)
+        assert(type(nl[2]) == int)
+        assert(len(flatten(nl)) == 5)
+        assert(type(flatten(nl)[1]) == int)
+        assert(type(flatten(nl)[2]) == int)

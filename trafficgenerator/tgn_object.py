@@ -7,6 +7,9 @@ Base class and utilities for all TGN objects.
 from collections import OrderedDict
 import gc
 from abc import ABCMeta, abstractmethod
+import json
+
+from trafficgenerator.tgn_utils import TgnError
 
 
 # Workaround IXN object reference bugs.
@@ -16,6 +19,29 @@ from abc import ABCMeta, abstractmethod
 # Object reference with neighborPairs (plural) instead of neighborPair (single).
 def _WA_norm_obj_ref(obj_ref):
     return obj_ref.replace('.0', '').replace('neighborPairs:', 'neighborPair:')
+
+
+class TgnObjectsDict(OrderedDict):
+
+    def __setitem__(self, key, value):
+        if not isinstance(key, TgnObject):
+            raise TgnError('tgn_object_dict keys must be TgnObject, not {}'.format(type(key)))
+        return OrderedDict.__setitem__(self, key, value)
+
+    def __getitem__(self, key):
+        if key in self.keys():
+            return OrderedDict.__getitem__(self, key)
+        else:
+            for obj in self:
+                if obj.name == key or obj.ref == key:
+                    return OrderedDict.__getitem__(self, obj)
+
+    def dumps(self):
+        str_keys_dict = OrderedDict({str(k): v for k, v in self.items()})
+        for k, v in str_keys_dict.items():
+            if type(v) is TgnObjectsDict:
+                str_keys_dict[k] = OrderedDict({str(k1): v1 for k1, v1 in v.items()})
+        return json.dumps(str_keys_dict, indent=4)
 
 
 class TgnObject(object):
@@ -48,7 +74,7 @@ class TgnObject(object):
             self._data['parent'].objects[self.obj_ref()] = self
 
     def __str__(self):
-        return self.obj_name()
+        return self.name
 
     def get_subtree(self, types=[], level=1):
         """ Read all direct children of the requested types and all their descendants down to the requested level.
@@ -196,12 +222,12 @@ class TgnObject(object):
         if self.parent:
             self.parent.objects.pop(self.ref)
 
-    def del_objects_by_type(self, type):
+    def del_objects_by_type(self, type_):
         """ Delete all children objects.
 
-        :param type: type of objects to delete.
+        :param type_: type of objects to delete.
         """
-        [o.del_object_from_parent() for o in self.get_objects_by_type(type)]
+        [o.del_object_from_parent() for o in self.get_objects_by_type(type_)]
 
     @classmethod
     def get_objects_of_class(cls):

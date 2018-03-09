@@ -102,3 +102,4 @@ syntax: regexp
 ^\.pydevproject$
 
 .idea
+.pytest_cache
