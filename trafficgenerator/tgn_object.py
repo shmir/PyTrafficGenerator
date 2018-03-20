@@ -22,6 +22,11 @@ def _WA_norm_obj_ref(obj_ref):
 
 
 class TgnObjectsDict(OrderedDict):
+    """ Dictionary to map from TgnObjects to whatever data.
+
+    Dictionary keys must be TgnObject but then it can be accessed by the object itself, the object reference or the
+    object name.
+    """
 
     def __setitem__(self, key, value):
         if not isinstance(key, TgnObject):
@@ -36,12 +41,19 @@ class TgnObjectsDict(OrderedDict):
                 if obj.name == key or obj.ref == key:
                     return OrderedDict.__getitem__(self, obj)
 
-    def dumps(self):
+    def dumps(self, indent=1):
+        """ Returns nested string representation of the dictionary (like json.dumps).
+
+        :param indent: indentation level.
+        """
         str_keys_dict = OrderedDict({str(k): v for k, v in self.items()})
         for k, v in str_keys_dict.items():
-            if type(v) is TgnObjectsDict:
+            if isinstance(v, dict):
                 str_keys_dict[k] = OrderedDict({str(k1): v1 for k1, v1 in v.items()})
-        return json.dumps(str_keys_dict, indent=4)
+                for k1, v1 in str_keys_dict[k].items():
+                    if isinstance(v1, dict):
+                        str_keys_dict[k][k1] = OrderedDict({str(k2): v2 for k2, v2 in v1.items()})
+        return json.dumps(str_keys_dict, indent=indent)
 
 
 class TgnObject(object):

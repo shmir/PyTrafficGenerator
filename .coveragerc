@@ -1,0 +1,3 @@
+[run]
+omit =
+    trafficgenerator/tgn_tcl.py
