@@ -14,10 +14,15 @@ from queue import Queue
 
 from trafficgenerator.tgn_utils import new_log_file
 
-if sys.version_info[0] < 3:
-    from Tkinter import Tcl
-else:
-    from tkinter import Tcl
+# IxExplorer only uses Tcl utilities (over socket) without Tcl interpreter so it's OK if Tcl is not installed (e.g for
+# some Linux installations). If Tcl interpreter is required and not installed it will fail anyway...
+try:
+    if sys.version_info[0] < 3:
+        from Tkinter import Tcl
+    else:
+        from tkinter import Tcl
+except Exception as _:
+    pass
 
 
 def tcl_str(string=''):
@@ -60,21 +65,28 @@ tcl_interp_g = None
 """ Global Tcl interpreter for Tcl based utilities. Does not log its operations. """
 
 
-def tcl_list_2_py_list(tcl_list):
+def tcl_list_2_py_list(tcl_list, within_tcl_str=False):
     """ Convert Tcl list to Python list using Tcl interpreter.
 
     :param tcl_list: string representing the Tcl string.
-    :return: Python list equivalent to the Tcl list.
+    :param within_tcl_str: True - Tcl list is embedded within Tcl str. False - native Tcl string.
+    :return: Python list equivalent to the Tcl ist.
+    :rtye: list
     """
-    return tcl_interp_g.eval('join' + tcl_str(tcl_list) + 'LiStSeP').split('LiStSeP') if tcl_list else []
+
+    if not within_tcl_str:
+        tcl_list = tcl_str(tcl_list)
+    return tcl_interp_g.eval('join ' + tcl_list + ' LiStSeP').split('LiStSeP') if tcl_list else []
 
 
 def py_list_to_tcl_list(py_list):
     """ Convert Python list to Tcl list using Tcl interpreter.
 
     :param py_list: Python list.
+    :type py_list: list
     :return: string representing the Tcl string equivalent to the Python list.
     """
+
     py_list_str = [str(s) for s in py_list]
     return tcl_str(tcl_interp_g.eval('split' + tcl_str('\t'.join(py_list_str)) + '\\t'))
 
@@ -177,8 +189,8 @@ class TgnTclWrapper(object):
 
         Add logger to log Tcl commands only.
         This creates a clean Tcl script that can be used later for debug.
-        We assume that there might have both IXN and STC sessions simultaneously so we add suffix
-        to create two distinguished Tcl scripts.
+        We assume that there might have both multiple Tcl sessions simultaneously so we add suffix to create
+        multiple distinguished Tcl scripts.
         """
 
         if not logger:
