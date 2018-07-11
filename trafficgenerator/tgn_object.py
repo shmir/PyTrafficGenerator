@@ -46,6 +46,7 @@ class TgnObjectsDict(OrderedDict):
 
         :param indent: indentation level.
         """
+
         str_keys_dict = OrderedDict({str(k): v for k, v in self.items()})
         for k, v in str_keys_dict.items():
             if isinstance(v, dict):
@@ -54,6 +55,23 @@ class TgnObjectsDict(OrderedDict):
                     if isinstance(v1, dict):
                         str_keys_dict[k][k1] = OrderedDict({str(k2): v2 for k2, v2 in v1.items()})
         return json.dumps(str_keys_dict, indent=indent)
+
+
+class TgnSubStatsDict(TgnObjectsDict):
+    """ Dictionary that assumes it contains sub dictionary so if a requested key does not exit it will assume it is a
+        key of the first sub-dictionary.
+
+    Port and stream statistics should be hierarchical - {rx port, {key, value}} - to support multicast traffic.
+    However, in most cases there is only one RX port so the rx port level is redundant.
+    """
+
+    def __getitem__(self, key):
+        if super(self.__class__, self).__getitem__(key) is not None:
+            return super(self.__class__, self).__getitem__(key)
+        else:
+            if len(self) > 1:
+                raise KeyError('multiple values')
+            return list(self.values())[0][key]
 
 
 class TgnObject(object):

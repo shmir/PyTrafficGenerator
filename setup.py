@@ -32,7 +32,7 @@ setup(
     author='Yoram Shamir',
     install_requires=install_requires,
     author_email='yoram@ignissoft.com',
-    description='Base Python OO API package to automate traffic generators (Spirent TestCenter, Ixia IxNetwork etc.)',
+    description='Base Python OO API package to automate traffic generators (Spirent, Ixia, Xena etc.)',
     long_description=long_description,
     packages=['trafficgenerator', 'trafficgenerator.test'],
     include_package_data=True,

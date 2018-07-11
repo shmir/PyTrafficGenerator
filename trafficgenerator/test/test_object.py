@@ -8,7 +8,7 @@ import unittest
 from mock import MagicMock
 
 from trafficgenerator.tgn_utils import is_false, is_true, is_local_host, is_ip, flatten, TgnError
-from trafficgenerator.tgn_object import TgnObject, TgnObjectsDict
+from trafficgenerator.tgn_object import TgnObject, TgnObjectsDict, TgnSubStatsDict
 
 
 class TgnObjectTest(unittest.TestCase):
@@ -73,6 +73,17 @@ class TgnObjectTest(unittest.TestCase):
         assert(objects_dict[self.node2.name] == 'node 2 entry')
         assert(objects_dict[self.node2.ref] == 'node 2 entry')
         print(objects_dict.dumps())
+
+    def test_sub_dict(self):
+        sub_stats_dict = TgnSubStatsDict()
+        sub_stats_dict[self.node1] = {'a': 1, 'b': 2}
+        assert(sub_stats_dict[self.node1]['a'] == 1)
+        assert(sub_stats_dict[self.node1.name]['a'] == 1)
+        assert(sub_stats_dict['a'] == 1)
+        sub_stats_dict[self.node2] = {'c': 3, 'd': 4}
+        assert(sub_stats_dict[self.node1]['a'] == 1)
+        assert(sub_stats_dict[self.node2]['c'] == 3)
+        self.assertRaises(KeyError, sub_stats_dict.__getitem__, 'a')
 
 
 class TgnUtilsTest(unittest.TestCase):
