@@ -35,7 +35,7 @@ def is_true(str_value):
     :param str_value: String to evaluate.
     :returns: True if string represents True TGN attribute value else return False.
     """
-    return str_value.lower() in ('true', '1', '::ixnet::ok')
+    return str_value.lower() in ('true', 'yes', '1', '::ixnet::ok')
 
 
 def is_false(str_value):
@@ -43,7 +43,7 @@ def is_false(str_value):
     :param str_value: String to evaluate.
     :returns: True if string represents TGN attribute False value else return True.
     """
-    return str_value.lower() in ('false', '0', 'null', 'none', '::ixnet::obj-null')
+    return str_value.lower() in ('false', 'no', '0', 'null', 'none', '::ixnet::obj-null')
 
 
 def is_local_host(location):
