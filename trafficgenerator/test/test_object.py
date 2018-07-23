@@ -8,6 +8,7 @@ import unittest
 from mock import MagicMock
 
 from trafficgenerator.tgn_utils import is_false, is_true, is_local_host, is_ip, flatten, TgnError
+from trafficgenerator.tgn_app import TgnApp
 from trafficgenerator.tgn_object import TgnObject, TgnObjectsDict, TgnSubStatsDict
 
 
@@ -33,6 +34,9 @@ class TgnObjectTest(unittest.TestCase):
     def testHelloWorld(self):
         pass
 
+    def testApp(self):
+        TgnApp(None, None)
+
     def testObjectsTree(self):
         """ Test object search operations. """
 
@@ -46,6 +50,9 @@ class TgnObjectTest(unittest.TestCase):
 
         assert(self.root.get_object_by_name('name2') == self.node2)
         assert(len(self.root.get_objects_by_type('node')) == 2)
+        assert(len(self.root.get_objects_or_children_by_type('node')) == 2)
+        assert(self.root.get_object_or_child_by_type('node') == self.node1)
+        assert(self.root.get_object_by_type('node') == self.node1)
         assert(len(self.root.get_objects_by_type('no_such_object')) == 0)
         assert(self.root.get_object_by_ref('leaf1') == self.leaf1)
 
@@ -57,16 +64,15 @@ class TgnObjectTest(unittest.TestCase):
 
         assert(len(self.root.get_objects_with_attribute('node', 'attr_name', 'node1')) == 1)
 
-    def _mock_object(self, o):
-        o.get_attribute = MagicMock(name='get_attribute')
-        o.get_attribute('attr_name')
-        o.get_attribute.return_value = o.obj_ref()
+        assert(len(self.root.get_children()) == 3)
+        assert(self.root.get_child() == self.leaf1)
 
     def test_objects_dict(self):
         objects_dict = TgnObjectsDict()
         objects_dict[self.node1] = TgnObjectsDict()
         objects_dict[self.node1][self.node11] = 'node 11 entry'
         objects_dict[self.node1][self.node12] = 'node 12 entry'
+        objects_dict[self.node1][self.leaf11] = TgnObjectsDict()
         objects_dict[self.node2] = 'node 2 entry'
         self.assertRaises(TgnError, objects_dict.__setitem__, 'invalid key', '')
         assert(objects_dict[self.node2] == 'node 2 entry')
@@ -84,6 +90,13 @@ class TgnObjectTest(unittest.TestCase):
         assert(sub_stats_dict[self.node1]['a'] == 1)
         assert(sub_stats_dict[self.node2]['c'] == 3)
         self.assertRaises(KeyError, sub_stats_dict.__getitem__, 'a')
+
+    def _mock_object(self, o):
+        o.get_attribute = MagicMock(name='get_attribute')
+        o.get_attribute.return_value = o.ref
+
+        o.get_children = MagicMock()
+        o.get_children.return_value = o.get_objects_by_type()
 
 
 class TgnUtilsTest(unittest.TestCase):

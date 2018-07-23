@@ -77,7 +77,7 @@ class TgnSubStatsDict(TgnObjectsDict):
 class TgnObject(object):
     """ Base class for all TGN classes. """
 
-    objects = {}
+    objects = OrderedDict()
     """ Dictionary of child objects <object reference: object name>. """
 
     def __init__(self, **data):
@@ -105,18 +105,6 @@ class TgnObject(object):
 
     def __str__(self):
         return self.name
-
-    def get_subtree(self, types=[], level=1):
-        """ Read all direct children of the requested types and all their descendants down to the requested level.
-
-        :param types: list of requested types.
-        :param level: how many levels to go down the subtree.
-        """
-
-        if level == 0:
-            return
-        for child in self.get_children(*types):
-            child.get_subtree(level=level - 1)
 
     def get_child(self, *types):
         """
@@ -168,7 +156,6 @@ class TgnObject(object):
         return [o for o in self.objects.values() if o.obj_type().lower() in types_l]
 
     def get_object_by_type(self, *types):
-
         """
         :param types: requested object types.
         :return: the child of the specified types.
@@ -198,6 +185,18 @@ class TgnObject(object):
 
         objects = self.get_objects_by_type(*types)
         return objects if objects else self.get_children(*types)
+
+    def get_object_or_child_by_type(self, *types):
+        """ Get object if child already been read or get child.
+
+        Use this method for fast access to objects in case of static configurations.
+
+        :param types: requested object types.
+        :return: all children of the specified types.
+        """
+
+        objects = self.get_objects_or_children_by_type(*types)
+        return objects[0] if any(objects) else None
 
     def get_objects_with_object(self, obj_type, *child_types):
         """
