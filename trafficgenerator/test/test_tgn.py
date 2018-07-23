@@ -8,9 +8,7 @@ from os import path
 import sys
 import unittest
 import logging
-from configparser import SafeConfigParser
-
-from trafficgenerator.tgn_utils import ApiType
+from configparser import ConfigParser
 
 
 class TgnTest(unittest.TestCase):
@@ -23,19 +21,13 @@ class TgnTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        TgnTest.config = SafeConfigParser(allow_no_value=True)
+        TgnTest.config = ConfigParser(allow_no_value=True)
         TgnTest.config.read(TgnTest.config_file)
 
         TgnTest.logger.setLevel(TgnTest.config.get('Logging', 'level'))
         if TgnTest.config.get('Logging', 'file_name'):
             TgnTest.logger.addHandler(logging.FileHandler(TgnTest.config.get('Logging', 'file_name')))
         TgnTest.logger.addHandler(logging.StreamHandler(sys.stdout))
-
-        # To support non pytest runners.
-        try:
-            TgnTest.api = ApiType[pytest.config.getoption('--api')]  # @UndefinedVariable
-        except Exception as _:
-            TgnTest.api = ApiType[TgnTest.config.get('Server', 'api')]
 
     @classmethod
     def tearDownClass(cls):
