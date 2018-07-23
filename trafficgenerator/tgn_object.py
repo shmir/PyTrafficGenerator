@@ -111,7 +111,7 @@ class TgnObject(object):
         :param types: list of requested types.
         :return: the first (and in most useful cases only) child of specific type(s).
         """
-        children = self.get_children(*types)
+        children = list(self.get_children(*types))
         return children[0] if any(children) else None
 
     def get_object_by_ref(self, obj_ref):
