@@ -103,3 +103,4 @@ syntax: regexp
 
 .idea
 .pytest_cache
+.README.md.html

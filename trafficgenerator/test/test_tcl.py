@@ -6,7 +6,6 @@ Tests for TGN Tcl wrapper - the default wrapper.
 
 import sys
 from os import path
-import unittest
 import logging
 from configparser import SafeConfigParser
 
@@ -15,9 +14,9 @@ from trafficgenerator.tgn_tcl import TgnTclWrapper, tcl_list_2_py_list, py_list_
 config_file = path.join(path.dirname(__file__), 'TrafficGenerator.ini')
 
 
-class TclTest(unittest.TestCase):
+class TestTcl():
 
-    def setUp(self):
+    def setup(self):
         config = SafeConfigParser(allow_no_value=True)
         config.read(config_file)
 
@@ -28,10 +27,10 @@ class TclTest(unittest.TestCase):
 
         self.tcl = TgnTclWrapper(logger)
 
-    def tearDown(self):
+    def teardown(self):
         pass
 
-    def testList(self):
+    def test_list(self):
         """ Test Python->Tcl and Tcl->Python list conversion. """
 
         py_list = ['a', 'b b']
@@ -42,7 +41,7 @@ class TclTest(unittest.TestCase):
         py_list_length = len(tcl_list_2_py_list(tcl_list))
         assert(py_list_length == 2)
 
-    def testFilename(self):
+    def test_file_name(self):
         """ Test Tcl file names normalization. """
 
         assert(tcl_file_name('a\\b/c').strip() == '{a/b/c}')

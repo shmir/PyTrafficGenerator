@@ -11,6 +11,14 @@ Subpackages
 Submodules
 ----------
 
+trafficgenerator.tgn_app module
+----------------------------------
+
+.. automodule:: trafficgenerator.tgn_app
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 trafficgenerator.tgn_object module
 ----------------------------------
 
@@ -31,14 +39,6 @@ trafficgenerator.tgn_utils module
 ---------------------------------
 
 .. automodule:: trafficgenerator.tgn_utils
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-trafficgenerator.trafficgenerator module
-----------------------------------------
-
-.. automodule:: trafficgenerator.trafficgenerator
     :members:
     :undoc-members:
     :show-inheritance:

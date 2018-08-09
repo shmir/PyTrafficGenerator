@@ -6,7 +6,6 @@ Tests for TGN Tcl multithreading interpreter.
 
 import sys
 from os import path
-import unittest
 import logging
 from configparser import SafeConfigParser
 
@@ -15,9 +14,9 @@ from trafficgenerator.tgn_tcl import TgnTkMultithread, TgnTclWrapper
 config_file = path.join(path.dirname(__file__), 'TrafficGenerator.ini')
 
 
-class TclTest(unittest.TestCase):
+class TestTcl():
 
-    def setUp(self):
+    def setup(self):
         global tcl
 
         config = SafeConfigParser(allow_no_value=True)
@@ -32,8 +31,8 @@ class TclTest(unittest.TestCase):
         self.tcl_interp.start()
         self.tcl = TgnTclWrapper(logger, self.tcl_interp)
 
-    def tearDown(self):
+    def teardown(self):
         self.tcl_interp.stop()
 
-    def testPuts(self):
+    def test_puts(self):
         print(self.tcl.eval('set dummy "hello world"'))

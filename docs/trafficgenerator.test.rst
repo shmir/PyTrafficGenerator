@@ -4,18 +4,34 @@ trafficgenerator.test package
 Submodules
 ----------
 
-trafficgenerator.test.tcl_test module
--------------------------------------
+trafficgenerator.test.test_object module
+----------------------------------------
 
-.. automodule:: trafficgenerator.test.tcl_test
+.. automodule:: trafficgenerator.test.test_object
     :members:
     :undoc-members:
     :show-inheritance:
 
-trafficgenerator.test.tgn_test module
+trafficgenerator.test.test_tcl module
 -------------------------------------
 
-.. automodule:: trafficgenerator.test.tgn_test
+.. automodule:: trafficgenerator.test.test_tcl
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+trafficgenerator.test.test_tcl_thread module
+--------------------------------------------
+
+.. automodule:: trafficgenerator.test.test_tcl_thread
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+trafficgenerator.test.test_tgn module
+-------------------------------------
+
+.. automodule:: trafficgenerator.test.test_tgn
     :members:
     :undoc-members:
     :show-inheritance:

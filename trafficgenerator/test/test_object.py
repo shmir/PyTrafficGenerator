@@ -4,7 +4,7 @@ Tests for basic TGN object operations.
 @author yoram@ignissoft.com
 """
 
-import unittest
+import pytest
 from mock import MagicMock
 
 from trafficgenerator.tgn_utils import is_false, is_true, is_local_host, is_ip, flatten, TgnError
@@ -12,9 +12,9 @@ from trafficgenerator.tgn_app import TgnApp
 from trafficgenerator.tgn_object import TgnObject, TgnObjectsDict, TgnSubStatsDict
 
 
-class TgnObjectTest(unittest.TestCase):
+class TestTgnObject():
 
-    def setUp(self):
+    def setup(self):
         self.root = TgnObject(objRef='root1', objType='root', parent=None)
         self.root.api = None
         self.root.logger = None
@@ -28,16 +28,16 @@ class TgnObjectTest(unittest.TestCase):
             if type(o) == TgnObject:
                 self._mock_object(o)
 
-    def tearDown(self):
+    def teardown(self):
         pass
 
-    def testHelloWorld(self):
+    def test_hello_world(self):
         pass
 
-    def testApp(self):
+    def test_app(self):
         TgnApp(None, None)
 
-    def testObjectsTree(self):
+    def test_objects_tree(self):
         """ Test object search operations. """
 
         assert(self.root.obj_ref() == 'root1')
@@ -74,7 +74,8 @@ class TgnObjectTest(unittest.TestCase):
         objects_dict[self.node1][self.node12] = 'node 12 entry'
         objects_dict[self.node1][self.leaf11] = TgnObjectsDict()
         objects_dict[self.node2] = 'node 2 entry'
-        self.assertRaises(TgnError, objects_dict.__setitem__, 'invalid key', '')
+        with pytest.raises(TgnError) as _:
+            objects_dict.__setitem__('invalid key', '')
         assert(objects_dict[self.node2] == 'node 2 entry')
         assert(objects_dict[self.node2.name] == 'node 2 entry')
         assert(objects_dict[self.node2.ref] == 'node 2 entry')
@@ -89,7 +90,8 @@ class TgnObjectTest(unittest.TestCase):
         sub_stats_dict[self.node2] = {'c': 3, 'd': 4}
         assert(sub_stats_dict[self.node1]['a'] == 1)
         assert(sub_stats_dict[self.node2]['c'] == 3)
-        self.assertRaises(KeyError, sub_stats_dict.__getitem__, 'a')
+        with pytest.raises(KeyError) as _:
+            sub_stats_dict.__getitem__('a')
 
     def _mock_object(self, o):
         o.get_attribute = MagicMock(name='get_attribute')
@@ -99,9 +101,9 @@ class TgnObjectTest(unittest.TestCase):
         o.get_children.return_value = o.get_objects_by_type()
 
 
-class TgnUtilsTest(unittest.TestCase):
+class TestTgnUtils():
 
-    def testTrueFalse(self):
+    def test_true_false(self):
         """ Test TGN true and false values. """
 
         for false_stc in ('False', 'false', '0', 'null', 'NONE', 'none', '::ixnet::obj-null'):
@@ -112,7 +114,7 @@ class TgnUtilsTest(unittest.TestCase):
             assert(is_true(true_str))
             assert(not is_false(true_str))
 
-    def testLocalhost(self):
+    def test_localhost(self):
         """ Test TGN localhost values. """
 
         for location in ('127.0.0.1', 'localhost', 'Localhost/1/1', '//(Offline)/1/1', 'null'):
@@ -121,7 +123,7 @@ class TgnUtilsTest(unittest.TestCase):
         for location in ('1.2.3.4', 'hostname', '192.168.1.1/1/2'):
             assert(not is_local_host(location))
 
-    def testIps(self):
+    def test_ips(self):
         """ Test TGN IP values. """
 
         for ip in ('IPV4', 'ipv6', 'ipv4if', 'IPV6IF'):
@@ -130,7 +132,7 @@ class TgnUtilsTest(unittest.TestCase):
         for ip in ('mac', 'bla'):
             assert(not is_ip(ip))
 
-    def testFlatten(self):
+    def test_flatten(self):
         nl = [1, [11, [111]], 2, [22]]
         assert(len(nl) == 4)
         assert(type(nl[1]) == list)
