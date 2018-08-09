@@ -18,8 +18,6 @@ def read(*filenames, **kwargs):
     return sep.join(buf)
 
 
-long_description = read('README.md')
-
 with open('requirements.txt') as f:
     required = f.read().splitlines()
 install_requires = [r for r in required if r and r[0] != '#' and not r.startswith('git')]
@@ -33,7 +31,10 @@ setup(
     install_requires=install_requires,
     author_email='yoram@ignissoft.com',
     description='Base Python OO API package to automate traffic generators (Spirent, Ixia, Xena etc.)',
-    long_description=long_description,
+    long_description=read('README.md'),
+    long_description_content_type='text/markdown',
+    charset='UTF-8',
+    variant='GFM',
     packages=['trafficgenerator', 'trafficgenerator.test'],
     include_package_data=True,
     platforms='any',
@@ -45,5 +46,5 @@ setup(
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Apache Software License',
         'Operating System :: OS Independent',
-        'Topic :: Software Development :: Testing :: Traffic Generation'],
+        'Topic :: Software Development :: Testing :: Traffic Generation']
 )
