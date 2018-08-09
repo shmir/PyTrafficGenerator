@@ -10,7 +10,7 @@ import logging
 from configparser import ConfigParser
 
 
-class TestTgnBase():
+class TestTgnBase(object):
     """ Base class for all TGN tests - read ini file and create logger. """
 
     config_file = path.join(path.dirname(__file__), 'TrafficGenerator.ini')
@@ -18,8 +18,7 @@ class TestTgnBase():
     config = None
     logger = logging.getLogger('log')
 
-    @classmethod
-    def setupclass(cls):
+    def setup_class(self):
         TestTgnBase.config = ConfigParser(allow_no_value=True)
         TestTgnBase.config.read(TestTgnBase.config_file)
 
@@ -28,8 +27,13 @@ class TestTgnBase():
             TestTgnBase.logger.addHandler(logging.FileHandler(TestTgnBase.config.get('Logging', 'file_name')))
         TestTgnBase.logger.addHandler(logging.StreamHandler(sys.stdout))
 
-    @classmethod
-    def teardownclass(cls):
+    def teardown_class(self):
+        pass
+
+    def setup(self):
+        pass
+
+    def teardown(self):
         pass
 
     def test_hello_world(self):

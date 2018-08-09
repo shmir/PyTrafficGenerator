@@ -1,7 +1,7 @@
 
-# Base Python OO API for traffic generators (Ixia, Spirent, Xena etc.).
+## Base Python OO API for traffic generators (Ixia, Spirent, Xena etc.).
 
-## The package provides
+### The package provides
 
 - Common utilities.
 - Base class for all Python OO traffic generator classes.
@@ -12,16 +12,16 @@ The Python wrapper over Tcl can work on top of any Python Tcl interpreter as lon
 The default Python Tcl interpreter used is Tk package but in the package there is also a sample of implementation of
 Python Tcl interpreter over console (Telnet).
 
-## Logging
+### Logging
 
 - general messages + calls to underlining API + return values are logged to the logger provided by the application.
 	API calls are logged at debug level 
 - calls to underlining Tcl API are also logged to a separate file to create a native Tcl script that can be run as is.
 
-## Installation
+### Installation
 ```
 pip instsll pytrafficgen
 ```
 
-## Contact
+### Contact
 Feel free to contact me with any question or feature request at yoram@ignissoft.com
