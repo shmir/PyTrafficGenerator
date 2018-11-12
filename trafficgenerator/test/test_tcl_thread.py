@@ -7,7 +7,7 @@ Tests for TGN Tcl multithreading interpreter.
 import sys
 from os import path
 import logging
-from configparser import SafeConfigParser
+from configparser import ConfigParser
 
 from trafficgenerator.tgn_tcl import TgnTkMultithread, TgnTclWrapper
 
@@ -19,8 +19,8 @@ class TestTcl():
     def setup(self):
         global tcl
 
-        config = SafeConfigParser(allow_no_value=True)
-        config.read(config_file)
+        config = ConfigParser(allow_no_value=True)
+        config.read_file(open(config_file))
 
         logger = logging.getLogger('log')
         logger.setLevel(config.get('Logging', 'level'))

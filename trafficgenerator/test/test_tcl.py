@@ -7,7 +7,7 @@ Tests for TGN Tcl wrapper - the default wrapper.
 import sys
 from os import path
 import logging
-from configparser import SafeConfigParser
+from configparser import ConfigParser
 
 from trafficgenerator.tgn_tcl import TgnTclWrapper, tcl_list_2_py_list, py_list_to_tcl_list, tcl_file_name
 
@@ -17,8 +17,8 @@ config_file = path.join(path.dirname(__file__), 'TrafficGenerator.ini')
 class TestTcl():
 
     def setup(self):
-        config = SafeConfigParser(allow_no_value=True)
-        config.read(config_file)
+        config = ConfigParser(allow_no_value=True)
+        config.read_file(open(config_file))
 
         logger = logging.getLogger('log')
         logger.setLevel(config.get('Logging', 'level'))

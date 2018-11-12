@@ -20,7 +20,7 @@ class TestTgnBase(object):
 
     def setup_class(self):
         TestTgnBase.config = ConfigParser(allow_no_value=True)
-        TestTgnBase.config.read(TestTgnBase.config_file)
+        TestTgnBase.config.read_file(open(TestTgnBase.config_file))
 
         TestTgnBase.logger.setLevel(TestTgnBase.config.get('Logging', 'level'))
         if TestTgnBase.config.get('Logging', 'file_name'):
@@ -35,6 +35,3 @@ class TestTgnBase(object):
 
     def teardown(self):
         pass
-
-    def test_hello_world(self):
-        print(sys.version)
