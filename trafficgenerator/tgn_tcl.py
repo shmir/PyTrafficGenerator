@@ -168,8 +168,8 @@ class TgnTclConsole(object):
             raise Exception('{} - command timeout'.format(command))
         command = command.replace('\\', '/')
         con_command_out = con_command_out.replace('\\', '/')
-        command = command.replace('(', '\(').replace(')', '\)')
-        command = command.replace('{', '\{').replace('}', '\}')
+        command = command.replace('(', r'\(').replace(')', r'\)')
+        command = command.replace('{', r'\{').replace('}', r'\}')
         m = re.search(command + '(.*)' + '%', con_command_out, re.DOTALL)
         command_out = m.group(1).strip()
         if 'couldn\'t read file' in command_out or 'RuntimeError' in command_out:
@@ -217,12 +217,12 @@ class TgnTclWrapper(object):
         """
 
         if self.logger.handlers:
-            self.logger.debug(command.decode('utf-8'))
+            self.logger.debug(command)
         if self.tcl_script:
             self.tcl_script.info(command)
         self.rc = self.tcl_interp.eval(command)
         if self.logger.handlers:
-            self.logger.debug('\t' + self.rc.decode('utf-8'))
+            self.logger.debug('\t' + self.rc)
         return self.rc
 
     def source(self, script_file):
