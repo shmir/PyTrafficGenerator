@@ -35,16 +35,20 @@ setup(
     long_description_content_type='text/markdown',
     charset='UTF-8',
     variant='GFM',
-    packages=['trafficgenerator', 'trafficgenerator.test'],
+    packages=['trafficgenerator'],
     include_package_data=True,
     platforms='any',
-    tests_require=['pytest'],
     classifiers=[
         'Programming Language :: Python',
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         'Natural Language :: English',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Apache Software License',
         'Operating System :: OS Independent',
-        'Topic :: Software Development :: Testing :: Traffic Generation']
+        'Topic :: Software Development :: Testing :: Traffic Generation',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+    ]
 )

@@ -98,7 +98,7 @@ class TgnObject(object):
         if 'objRef' not in self._data:
             self._data['objRef'] = self._create()
         if 'name' not in self._data:
-            self._data['name'] = self.obj_ref()
+            self._data['name'] = self.ref
         if self._data.get('parent', None):
             # todo: make sure each object has parent and test only for None parents (STC project and IXN root)..
             self._data['parent'].objects[self.obj_ref()] = self
@@ -278,7 +278,13 @@ class TgnObject(object):
     name = property(obj_name)
 
     def obj_ref(self):
-        """
+        """ Object refernce is unique, descriptive, ID within the objects tree.
+
+        In some TGs (IxNetwork, STC, IxLoad...) the refernece is maintained by the TG itself and is used for API calls.
+        In others (Xena, TRex...) the reference is maintained by the TG package and may (Xena REST) or may not be used
+            for API calls.
+        If the reference is not used for API calls, use index or relative index for API calls.
+
         :return: object reference.
         """
         return str(self._data['objRef'])
@@ -297,6 +303,24 @@ class TgnObject(object):
         """
         return self._data['parent']
     parent = property(obj_parent)
+
+    def obj_index(self):
+        """ Object index is the index string used for API calls when object reference there is not used.
+
+        Object index structure is something like chassis/card/port.
+
+        :return: object index.
+        """
+        return str(self._data['index'])
+    index = property(obj_index)
+
+    def obj_id(self):
+        """ Object ID is the relative ID of the object.
+
+        :return: object relative ID.
+        """
+        return int(self.index.split('/')[-1]) if self.index else None
+    id = property(obj_id)
 
     #
     # Private methods.

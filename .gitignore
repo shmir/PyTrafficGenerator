@@ -92,7 +92,7 @@ venv*/
 *-save.*
 *-1way.*
 *-2way.*
-trafficgenerator/test/logs
+test/logs
 
 syntax: regexp
 ^trafficgenerator/test/logs/configs_per_protocol$
