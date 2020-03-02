@@ -332,7 +332,7 @@ class TgnObject(object):
     def _build_children_objs(self, child_type, children):
         children_objs = OrderedDict()
         child_obj_type = self.get_obj_class(child_type)
-        for child in (c for c in children if c is not ''):
+        for child in (c for c in children if c != ''):
             child_object = child_obj_type(objRef=child, objType=child_type, parent=self)
             child_object._set_data(name=child_object.get_name())
             children_objs[child_object.obj_ref()] = child_object

@@ -4,10 +4,12 @@ TGN projects utilities and errors.
 @author: yoram.shamir
 """
 
+import sys
 import logging
 from os import path
 from enum import Enum
-import collections
+from collections import Iterable
+from configparser import ConfigParser
 
 
 class TgnType(Enum):
@@ -24,7 +26,7 @@ class ApiType(Enum):
 
 
 def flatten(x):
-    if isinstance(x, collections.Iterable):
+    if isinstance(x, Iterable):
         return [a for i in x for a in flatten(i)]
     else:
         return [x]
@@ -107,3 +109,30 @@ def new_log_file(logger, suffix, file_type='tcl'):
 class TgnError(Exception):
     """ Base exception for traffic generator exceptions. """
     pass
+
+
+class TestTgnBase(object):
+    """ Base class for all TGN tests - read ini file and create logger. """
+
+    config_file = path.join(path.dirname(__file__), 'TrafficGenerator.ini')
+
+    config = None
+    logger = logging.getLogger('log')
+
+    def setup_class(self):
+        TestTgnBase.config = ConfigParser(allow_no_value=True)
+        TestTgnBase.config.read_file(open(TestTgnBase.config_file))
+
+        TestTgnBase.logger.setLevel(TestTgnBase.config.get('Logging', 'level'))
+        if TestTgnBase.config.get('Logging', 'file_name'):
+            TestTgnBase.logger.addHandler(logging.FileHandler(TestTgnBase.config.get('Logging', 'file_name')))
+        TestTgnBase.logger.addHandler(logging.StreamHandler(sys.stdout))
+
+    def teardown_class(self):
+        pass
+
+    def setup(self):
+        pass
+
+    def teardown(self):
+        pass
