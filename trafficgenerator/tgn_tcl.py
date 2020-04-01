@@ -11,6 +11,7 @@ import time
 import re
 from threading import Thread
 from queue import Queue
+import json
 
 from trafficgenerator.tgn_utils import new_log_file
 
@@ -58,25 +59,34 @@ def build_obj_ref_list(objects):
     :returns: Tcl list of all requested objects references.
     """
 
-    return ' '.join([o.obj_ref() for o in objects])
+    return ' '.join([o.ref for o in objects])
 
 
 tcl_interp_g = None
 """ Global Tcl interpreter for Tcl based utilities. Does not log its operations. """
 
 
-def tcl_list_2_py_list(tcl_list, within_tcl_str=False):
+def tcl_list_2_py_list(tcl_list):
     """ Convert Tcl list to Python list using Tcl interpreter.
 
-    :param tcl_list: string representing the Tcl string.
-    :param within_tcl_str: True - Tcl list is embedded within Tcl str. False - native Tcl string.
-    :return: Python list equivalent to the Tcl ist.
+    This function supports only simple lists and list of lists, not further.
+
+    :param str tcl_list: string representing the Tcl list.
+    :return: Python list equivalent to the Tcl list.
     :rtye: list
     """
 
-    if not within_tcl_str:
-        tcl_list = tcl_str(tcl_list)
-    return tcl_interp_g.eval('join ' + tcl_list + ' LiStSeP').split('LiStSeP') if tcl_list else []
+    if not tcl_list:
+        return []
+
+    try:
+        return json.loads(tcl_list)
+    except Exception as _:
+        try:
+            python_list = tcl_interp_g.eval('join ' + tcl_list + ' LiStSeP').split('LiStSeP')
+        except Exception as _:
+            python_list = tcl_interp_g.eval('join ' + tcl_str(tcl_list) + ' LiStSeP').split('LiStSeP')
+        return [e.split() for e in python_list] if tcl_list[0:2] == '{{' else python_list
 
 
 def py_list_to_tcl_list(py_list):

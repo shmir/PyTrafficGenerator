@@ -35,11 +35,29 @@ class TestTcl():
 
         py_list = ['a', 'b b']
         tcl_list_length = self.tcl.eval('llength ' + py_list_to_tcl_list(py_list))
-        assert(int(tcl_list_length) == 2)
+        assert int(tcl_list_length) == 2
 
         tcl_list = '{a} {b b}'
-        py_list_length = len(tcl_list_2_py_list(tcl_list))
-        assert(py_list_length == 2)
+        python_list = tcl_list_2_py_list(tcl_list)
+        assert len(python_list) == 2
+        assert type(python_list[0]) is str
+        assert type(python_list[1]) is str
+
+        tcl_list = '{{a} {b b}}'
+        python_list = tcl_list_2_py_list(tcl_list)
+        assert len(python_list) == 2
+        assert type(python_list[0]) is list
+        assert type(python_list[1]) is list
+        assert len(python_list[1]) == 2
+
+        tcl_list = ''
+        assert len(tcl_list_2_py_list(tcl_list)) == 0
+
+        tcl_list = '{}'
+        assert len(tcl_list_2_py_list(tcl_list)) == 0
+
+        tcl_list = '[["a"], ["b", "b"]]'
+        assert len(tcl_list_2_py_list(tcl_list)) == 2
 
     def test_file_name(self):
         """ Test Tcl file names normalization. """
