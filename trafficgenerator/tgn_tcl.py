@@ -1,10 +1,7 @@
 """
 Base class and utilities for TGN Python Tcl wrapper.
-
-@author: yoram.shamir
 """
 
-import sys
 from os import path
 import logging
 import time
@@ -15,18 +12,15 @@ import json
 
 from trafficgenerator.tgn_utils import new_log_file
 
-# IxExplorer only uses Tcl utilities (over socket) without Tcl interpreter so it's OK if Tcl is not installed (e.g for
+# Tcl is must only if the test chooses to use Tcl API so it is OK if Tcl is not installed (e.g for
 # some Linux installations). If Tcl interpreter is required and not installed it will fail anyway...
 try:
-    if sys.version_info[0] < 3:
-        from Tkinter import Tcl
-    else:
-        from tkinter import Tcl
+    from tkinter import Tcl
 except Exception as _:
     pass
 
 
-def tcl_str(string=''):
+def tcl_str(string: str = '') -> str:
     """
     :param string: Python string.
     :returns: Tcl string surrounded by {}.
@@ -35,9 +29,9 @@ def tcl_str(string=''):
     return ' {' + string + '} '
 
 
-def tcl_file_name(name):
+def tcl_file_name(name: str) -> str:
     """
-    :param names: file name.
+    :param name: file name.
     :returns: normalized file name with forward slashes.
     """
 
