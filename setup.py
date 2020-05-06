@@ -1,10 +1,8 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-from setuptools import setup
+from setuptools import setup, find_packages
 import io
-
-import trafficgenerator
 
 
 def read(*filenames, **kwargs):
@@ -23,7 +21,7 @@ install_requires = [r for r in required if r and r[0] != '#' and not r.startswit
 
 setup(
     name='pytrafficgen',
-    version=trafficgenerator.__version__,
+    version='3.0.1',
     url='https://github.com/shmir/PyTrafficGenerator/',
     license='Apache Software License',
     author='Yoram Shamir',
@@ -34,7 +32,7 @@ setup(
     long_description_content_type='text/markdown',
     charset='UTF-8',
     variant='GFM',
-    packages=['trafficgenerator'],
+    packages=find_packages(exclude=['tests']),
     include_package_data=True,
     platforms='any',
     classifiers=[
@@ -47,5 +45,6 @@ setup(
         'Topic :: Software Development :: Testing :: Traffic Generation',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
-    ]
+    ],
+    keywords='ixia spirent xena trex byteblower l2l3 test automation',
 )

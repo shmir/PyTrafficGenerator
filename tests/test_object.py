@@ -1,7 +1,5 @@
 """
 Tests for basic TGN object operations.
-
-@author yoram@ignissoft.com
 """
 
 import pytest
@@ -12,7 +10,7 @@ from trafficgenerator.tgn_app import TgnApp
 from trafficgenerator.tgn_object import TgnObject, TgnObjectsDict, TgnSubStatsDict
 
 
-class TestTgnObject():
+class TestTgnObject:
 
     def setup(self):
         self.root = TgnObject(objRef='root1', objType='root', parent=None)
