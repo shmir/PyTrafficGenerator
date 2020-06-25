@@ -21,7 +21,7 @@ install_requires = [r for r in required if r and r[0] != '#' and not r.startswit
 
 setup(
     name='pytrafficgen',
-    version='3.0.1',
+    version='3.0.2',
     url='https://github.com/shmir/PyTrafficGenerator/',
     license='Apache Software License',
     author='Yoram Shamir',
