@@ -1,13 +1,13 @@
 """
 Base class and utilities for all TGN objects.
-
-@author yoram@ignissoft.com
 """
 
+from __future__ import annotations
 from collections import OrderedDict
 import gc
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 import json
+from typing import Type, List, Dict
 
 from trafficgenerator.tgn_utils import TgnError
 
@@ -17,7 +17,7 @@ from trafficgenerator.tgn_utils import TgnError
 #    For example, endpointset->sources attribute might return:
 #    vport:1/protocols/bgp/neighborRange:1.0/routeRange:1.
 # Object reference with neighborPairs (plural) instead of neighborPair (single).
-def _WA_norm_obj_ref(obj_ref):
+def _wa_norm_obj_ref(obj_ref):
     return obj_ref.replace('.0', '').replace('neighborPairs:', 'neighborPair:')
 
 
@@ -74,7 +74,7 @@ class TgnSubStatsDict(TgnObjectsDict):
             return list(self.values())[0][key]
 
 
-class TgnObject(object):
+class TgnObject(ABC):
     """ Base class for all TGN classes. """
 
     objects = OrderedDict()
@@ -100,8 +100,8 @@ class TgnObject(object):
         if 'name' not in self._data:
             self._data['name'] = self.ref
         if self._data.get('parent', None):
-            # todo: make sure each object has parent and test only for None parents (STC project and IXN root)..
-            self._data['parent'].objects[self.obj_ref()] = self
+            # todo: make sure each object has parent and test only for None parents (STC project and IXN root).
+            self._data['parent'].objects[self.ref] = self
 
     def __str__(self):
         return self.name
@@ -119,7 +119,7 @@ class TgnObject(object):
         :param obj_ref: requested object reference.
         :return: the first object with the requested object reference in the object branch.
         """
-        return self._get_object_by_key('objRef', _WA_norm_obj_ref(obj_ref))
+        return self._get_object_by_key('objRef', _wa_norm_obj_ref(obj_ref))
 
     def get_object_by_name(self, obj_name):
         """
@@ -201,7 +201,7 @@ class TgnObject(object):
     def get_objects_with_object(self, obj_type, *child_types):
         """
         :param obj_type: requested object type.
-        :param child_type: requested child types.
+        :param child_types: requested child types.
         :return: all children of the requested type that have the requested child types.
         """
 
@@ -211,7 +211,7 @@ class TgnObject(object):
     def get_objects_without_object(self, obj_type, *child_types):
         """
         :param obj_type: requested object type.
-        :param child_type: unrequested child types.
+        :param child_types: unrequested child types.
         :return: all children of the requested type that do not have the unrequested child types.
         """
         return [o for o in self.get_objects_by_type(obj_type) if
@@ -239,13 +239,6 @@ class TgnObject(object):
                 return None
             return self.parent.get_ancestor_object_by_type(obj_type)
 
-    def get_object_from_attribute(self, attribute):
-        return self.get_objects_from_attribute(attribute)[0] if self.get_objects_from_attribute(attribute) else None
-
-    @abstractmethod
-    def get_objects_from_attribute(self, attribute):
-        pass
-
     def del_object_from_parent(self):
         """ Delete object from parent object. """
         if self.parent:
@@ -257,6 +250,15 @@ class TgnObject(object):
         :param type_: type of objects to delete.
         """
         [o.del_object_from_parent() for o in self.get_objects_by_type(type_)]
+
+    def get_object_from_attribute(self, attribute: str) -> Type[TgnObject] or None:
+        """ Read attribute as reference and return an object for it.
+
+        Return object if exists in the objects tree, else create new one under the self object.
+
+        :param attribute: attribute containg the object references.
+        """
+        return self.get_objects_from_attribute(attribute) or None
 
     @classmethod
     def get_objects_of_class(cls):
@@ -270,15 +272,15 @@ class TgnObject(object):
     # changing the key name couple of times I decided to go for it.
     #
 
-    def obj_name(self):
+    def obj_name(self) -> str:
         """
         :return: object name.
         """
         return self._data['name']
     name = property(obj_name)
 
-    def obj_ref(self):
-        """ Object refernce is unique, descriptive, ID within the objects tree.
+    def obj_ref(self) -> str:
+        """ Object reference is unique, descriptive, ID within the objects tree.
 
         In some TGs (IxNetwork, STC, IxLoad...) the refernece is maintained by the TG itself and is used for API calls.
         In others (Xena, TRex...) the reference is maintained by the TG package and may (Xena REST) or may not be used
@@ -290,21 +292,21 @@ class TgnObject(object):
         return str(self._data['objRef'])
     ref = property(obj_ref)
 
-    def obj_type(self):
+    def obj_type(self) -> str:
         """
         :return: object type.
         """
         return self._data['objType']
     type = property(obj_type)
 
-    def obj_parent(self):
+    def obj_parent(self) -> Type[TgnObject]:
         """
         :return: object parent.
         """
         return self._data['parent']
     parent = property(obj_parent)
 
-    def obj_index(self):
+    def obj_index(self) -> str:
         """ Object index is the index string used for API calls when object reference there is not used.
 
         Object index structure is something like chassis/card/port.
@@ -314,7 +316,7 @@ class TgnObject(object):
         return str(self._data['index'])
     index = property(obj_index)
 
-    def obj_id(self):
+    def obj_id(self) -> int:
         """ Object ID is the relative ID of the object.
 
         :return: object relative ID.
@@ -344,28 +346,50 @@ class TgnObject(object):
     #
 
     @abstractmethod
-    def get_attribute(self, attribute):
-        """ Get single attribute value.
+    def _create(self, **attributes: Dict[str, object]) -> str:
+        """ Create new object on the chassis and return its object reference.
 
-        :param attribute: attribute name.
-        :return: attribute value.
+        :param attributes: additional attributes for the create command.
         """
         pass
 
     @abstractmethod
-    def get_children(self, *types):
+    def get_attribute(self, attribute: str) -> str:
+        """ Get single attribute value.
+
+        :param attribute: attribute name.
+        """
+        pass
+
+    @abstractmethod
+    def get_children(self, *types: List[str]) -> List[Type[TgnObject]]:
         """ Get all children of the requested types.
 
-        :param attribute: requested children types.
-        :return: list of all children of the requested types.
+        :param types: requested children types.
+        """
+        pass
+
+    @abstractmethod
+    def get_objects_from_attribute(self, attribute: str) -> List[Type[TgnObject]]:
+        """ Read attribute as list of references and return an object for each of them.
+
+        Return object if exists in the objects tree, else create new one under the self object.
+
+        :param attribute: attribute containing the object references.
+        """
+        pass
+
+    @abstractmethod
+    def get_obj_class(self, obj_type: str) -> Type[TgnObject.__class__]:
+        """ Returns the object class based on parent and object type.
+
+        :param obj_type: requested object type.
         """
         pass
 
 
-class TgnL3(object):
+class TgnL3(ABC):
     """ ABC for all L3 objects. """
-
-    __metaclass__ = ABCMeta
 
     @abstractmethod
     def ip(self):

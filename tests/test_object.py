@@ -1,6 +1,7 @@
 """
 Tests for basic TGN object operations.
 """
+from typing import Type, List, Dict
 
 import pytest
 from mock import MagicMock
@@ -10,20 +11,39 @@ from trafficgenerator.tgn_app import TgnApp
 from trafficgenerator.tgn_object import TgnObject, TgnObjectsDict, TgnSubStatsDict
 
 
+class TestObject(TgnObject):
+
+    def _create(self, **attributes: Dict[str, object]) -> str:
+        pass
+
+    def get_attribute(self, attribute: str) -> str:
+        pass
+
+    def get_children(self, *types: List[str]) -> List[Type[TgnObject]]:
+        pass
+
+    def get_objects_from_attribute(self, attribute: str) -> List[Type[TgnObject]]:
+        pass
+
+    def get_obj_class(self, obj_type: str) -> Type[TgnObject.__class__]:
+        pass
+
+
 class TestTgnObject:
+    """ Replace setup and teardown with fixtures. """
 
     def setup(self):
-        self.root = TgnObject(objRef='root1', objType='root', parent=None)
+        self.root = TestObject(objRef='root1', objType='root', parent=None)
         self.root.api = None
         self.root.logger = None
-        self.leaf1 = TgnObject(objRef='leaf1', objType='leaf', parent=self.root)
-        self.node1 = TgnObject(objRef='node1', objType='node', parent=self.root, name='name1')
-        self.node2 = TgnObject(objRef='node2', objType='node', parent=self.root, name='name2')
-        self.node11 = TgnObject(objRef='node11', objType='node', parent=self.node1, name='name11')
-        self.node12 = TgnObject(objRef='node12', objType='node', parent=self.node1, name='name12')
-        self.leaf11 = TgnObject(objRef='leaf11', objType='leaf', parent=self.node1)
+        self.leaf1 = TestObject(objRef='leaf1', objType='leaf', parent=self.root)
+        self.node1 = TestObject(objRef='node1', objType='node', parent=self.root, name='name1')
+        self.node2 = TestObject(objRef='node2', objType='node', parent=self.root, name='name2')
+        self.node11 = TestObject(objRef='node11', objType='node', parent=self.node1, name='name11')
+        self.node12 = TestObject(objRef='node12', objType='node', parent=self.node1, name='name12')
+        self.leaf11 = TestObject(objRef='leaf11', objType='leaf', parent=self.node1)
         for o in self.__dict__.values():
-            if type(o) == TgnObject:
+            if type(o) == TestObject:
                 self._mock_object(o)
 
     def teardown(self):
