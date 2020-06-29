@@ -5,7 +5,7 @@ TGN projects utilities and errors.
 import logging
 from os import path
 from enum import Enum
-from collections import Iterable
+from collections.abc import Iterable
 
 
 class TgnType(Enum):

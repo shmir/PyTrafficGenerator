@@ -80,7 +80,7 @@ class TgnObject(ABC):
     objects = OrderedDict()
     """ Dictionary of child objects <object reference: object name>. """
 
-    def __init__(self, **data):
+    def __init__(self, parent: Optional[TgnObject], **data):
         """ Create new TGN object in the API.
 
         If object does not exist on the chassis, create it on the chassis as well.
@@ -88,13 +88,14 @@ class TgnObject(ABC):
         :param parent: object parent. If == None the api and logger attributes must be set explicitly by the caller.
         """
 
-        super(TgnObject, self).__init__()
+        super().__init__()
         self._data = {}
         self.objects = OrderedDict()
         self._set_data(**data)
-        if self._data['parent']:
-            self.api = self.obj_parent().api
-            self.logger = self.obj_parent().logger
+        self._data['parent'] = parent
+        if self.parent:
+            self.api = self.parent.api
+            self.logger = self.parent.logger
         if 'objRef' not in self._data:
             self._data['objRef'] = self._create()
         if 'name' not in self._data:
@@ -301,7 +302,7 @@ class TgnObject(ABC):
         return self._data['objType']
     type = property(obj_type)
 
-    def obj_parent(self) -> Type[TgnObject]:
+    def obj_parent(self) -> TgnObject:
         """
         :return: object parent.
         """
@@ -353,6 +354,11 @@ class TgnObject(ABC):
 
         :param attributes: additional attributes for the create command.
         """
+        pass
+
+    @abstractmethod
+    def get_name(self) -> str:
+        """ Get object name. """
         pass
 
     @abstractmethod

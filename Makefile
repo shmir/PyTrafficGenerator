@@ -9,6 +9,14 @@ repo=localhost
 user=pypiadmin
 password=pypiadmin
 
+help:
+	@echo 'build: build the package'
+	@echo 'upload: create and upload the package to local pypi index'
+	@echo '        takes the following params:'
+	@echo '        repo=repository-url, default localhost:8086'
+	@echo '        user=user name, default pypiadmin'
+	@echo '        password=user password, default pypiadmin'
+
 .PHONY: build
 build:
 	rm -rf dist/*

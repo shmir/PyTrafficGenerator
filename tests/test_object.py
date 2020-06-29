@@ -28,9 +28,6 @@ def root():
 class TestObject(TgnObject):
     """ Mock test object. """
 
-    def _create(self, **attributes: Dict[str, object]) -> str:
-        pass
-
     def get_attributes(self) -> Dict[str, str]:
         """ Returns object data as its attributes. """
         return self._data
@@ -42,6 +39,14 @@ class TestObject(TgnObject):
     def get_children(self, *types: List[str]) -> List[TgnObject]:
         """ Returns all objects as children. """
         return list(self.objects.values())
+
+    def _create(self, **attributes: Dict[str, object]) -> str:
+        """ todo: add implementation and test. """
+        pass
+
+    def get_name(self) -> str:
+        """ todo: add implementation and test. """
+        pass
 
     def get_objects_from_attribute(self, attribute: str) -> List[TgnObject]:
         """ todo: add implementation and test. """
@@ -69,7 +74,7 @@ class TestTgnObject:
         assert root.node1.parent == root
 
         assert root.get_object_by_name('name2') == root.node2
-        assert len(root.get_objects_by_type('node'))== 2
+        assert len(root.get_objects_by_type('node')) == 2
         assert len(root.get_objects_or_children_by_type('node')) == 2
         assert root.get_object_or_child_by_type('node') == root.node1
         assert root.get_object_by_type('node') == root.node1
@@ -114,7 +119,7 @@ class TestTgnObject:
             sub_stats_dict.__getitem__('a')
 
 
-class TestTgnUtils():
+class TestTgnUtils:
 
     def test_true_false(self):
         """ Test TGN true and false values. """
