@@ -1,6 +1,8 @@
 -r requirements.txt
 
-mock
 pytest
 pytest-cov
 tox
+
+wheel
+setuptools-scm

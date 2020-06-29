@@ -7,7 +7,7 @@ from collections import OrderedDict
 import gc
 from abc import ABC, abstractmethod
 import json
-from typing import Type, List, Dict
+from typing import Type, List, Dict, Optional
 
 from trafficgenerator.tgn_utils import TgnError
 
@@ -112,7 +112,7 @@ class TgnObject(ABC):
         :return: the first (and in most useful cases only) child of specific type(s).
         """
         children = list(self.get_children(*types))
-        return children[0] if any(children) else None
+        return children[0] if children else None
 
     def get_object_by_ref(self, obj_ref):
         """
@@ -141,7 +141,7 @@ class TgnObject(ABC):
                 if obj is not None:
                     return obj
 
-    def get_objects_by_type(self, *types):
+    def get_objects_by_type(self, *types) -> List[TgnObject]:
         """ Returned objects stored in memory (without re-reading them from the TGN).
 
         Use this method for fast access to objects in case of static configurations.
@@ -153,7 +153,7 @@ class TgnObject(ABC):
         if not types:
             return self.objects.values()
         types_l = [o.lower() for o in types]
-        return [o for o in self.objects.values() if o.obj_type().lower() in types_l]
+        return [o for o in self.objects.values() if o.type.lower() in types_l]
 
     def get_object_by_type(self, *types):
         """
@@ -217,12 +217,12 @@ class TgnObject(ABC):
         return [o for o in self.get_objects_by_type(obj_type) if
                 not o.get_objects_by_type(*child_types)]
 
-    def get_objects_with_attribute(self, obj_type, attribute, value):
-        """
+    def get_objects_with_attribute(self, obj_type: str, attribute: str, value: str) -> List[TgnObject]:
+        """ Returns all children of the requested type that have the requested attribute == requested value.
+
         :param obj_type: requested object type.
         :param attribute: requested attribute.
         :param value: requested attribute value.
-        :return: all children of the requested type that have the requested attribute == requested value.
         """
         return [o for o in self.get_objects_by_type(obj_type) if o.get_attribute(attribute) == value]
 
@@ -251,14 +251,16 @@ class TgnObject(ABC):
         """
         [o.del_object_from_parent() for o in self.get_objects_by_type(type_)]
 
-    def get_object_from_attribute(self, attribute: str) -> Type[TgnObject] or None:
+    def get_object_from_attribute(self, attribute: str) -> Optional[TgnObject]:
         """ Read attribute as reference and return an object for it.
 
-        Return object if exists in the objects tree, else create new one under the self object.
+        Return object for the reference exists in the objects tree, else create new one under the self object.
+        Return None for empty attribute.
 
-        :param attribute: attribute containg the object references.
+        :param attribute: attribute containing the object references.
         """
-        return self.get_objects_from_attribute(attribute) or None
+        objects = self.get_objects_from_attribute(attribute)
+        return objects[0] if objects else None
 
     @classmethod
     def get_objects_of_class(cls):
@@ -282,7 +284,7 @@ class TgnObject(ABC):
     def obj_ref(self) -> str:
         """ Object reference is unique, descriptive, ID within the objects tree.
 
-        In some TGs (IxNetwork, STC, IxLoad...) the refernece is maintained by the TG itself and is used for API calls.
+        In some TGs (IxNetwork, STC, IxLoad...) the reference is maintained by the TG itself and is used for API calls.
         In others (Xena, TRex...) the reference is maintained by the TG package and may (Xena REST) or may not be used
             for API calls.
         If the reference is not used for API calls, use index or relative index for API calls.
@@ -354,6 +356,11 @@ class TgnObject(ABC):
         pass
 
     @abstractmethod
+    def get_attributes(self) -> Dict[str, str]:
+        """ Get all attributes values. """
+        pass
+
+    @abstractmethod
     def get_attribute(self, attribute: str) -> str:
         """ Get single attribute value.
 
@@ -362,7 +369,7 @@ class TgnObject(ABC):
         pass
 
     @abstractmethod
-    def get_children(self, *types: List[str]) -> List[Type[TgnObject]]:
+    def get_children(self, *types: List[str]) -> List[TgnObject]:
         """ Get all children of the requested types.
 
         :param types: requested children types.
@@ -370,17 +377,19 @@ class TgnObject(ABC):
         pass
 
     @abstractmethod
-    def get_objects_from_attribute(self, attribute: str) -> List[Type[TgnObject]]:
+    def get_objects_from_attribute(self, attribute: str) -> List[TgnObject]:
         """ Read attribute as list of references and return an object for each of them.
 
-        Return object if exists in the objects tree, else create new one under the self object.
+        For each reference in the attribute, return its object if exists in the objects tree or create new object under
+        the self object.
+        Return empty list for empty attribute.
 
         :param attribute: attribute containing the object references.
         """
         pass
 
     @abstractmethod
-    def get_obj_class(self, obj_type: str) -> Type[TgnObject.__class__]:
+    def get_obj_class(self, obj_type: str) -> Type[TgnObject]:
         """ Returns the object class based on parent and object type.
 
         :param obj_type: requested object type.
