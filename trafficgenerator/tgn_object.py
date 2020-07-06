@@ -130,7 +130,7 @@ class TgnObject(ABC):
         return self._get_object_by_key('name', obj_name)
 
     def _get_object_by_key(self, key, value, *types):
-        if self._data[key] == value and (types and self.obj_type() in types or not types):
+        if self._data[key] == value and (types and self.ref in types or not types):
             return self
         else:
             if not types:
@@ -152,7 +152,7 @@ class TgnObject(ABC):
         """
 
         if not types:
-            return self.objects.values()
+            return list(self.objects.values())
         types_l = [o.lower() for o in types]
         return [o for o in self.objects.values() if o.type.lower() in types_l]
 
@@ -375,7 +375,7 @@ class TgnObject(ABC):
         pass
 
     @abstractmethod
-    def get_children(self, *types: List[str]) -> List[TgnObject]:
+    def get_children(self, *types: str) -> List[TgnObject]:
         """ Get all children of the requested types.
 
         :param types: requested children types.

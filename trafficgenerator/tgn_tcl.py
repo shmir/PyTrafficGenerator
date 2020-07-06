@@ -9,8 +9,10 @@ import re
 from threading import Thread
 from queue import Queue
 import json
+from typing import Dict, List
 
 from trafficgenerator.tgn_utils import new_log_file
+from trafficgenerator.tgn_object import TgnObject
 
 # Tcl is must only if the test chooses to use Tcl API so it is OK if Tcl is not installed (e.g for
 # some Linux installations). If Tcl interpreter is required and not installed it will fail anyway...
@@ -38,7 +40,7 @@ def tcl_file_name(name: str) -> str:
     return tcl_str(path.normpath(name).replace('\\', '/'))
 
 
-def get_args_pairs(arguments):
+def get_args_pairs(arguments: Dict[str, object]) -> str:
     """
     :param arguments: Python dictionary of TGN API command arguments <key, value>.
     :returns: Tcl list of argument pairs <-key, value> to be used in TGN API commands.
@@ -47,7 +49,7 @@ def get_args_pairs(arguments):
     return ' '.join(' '.join(['-' + k, tcl_str(str(v))]) for k, v in arguments.items())
 
 
-def build_obj_ref_list(objects):
+def build_obj_ref_list(objects: List[TgnObject]) -> str:
     """
     :param objects: Python list of requested objects.
     :returns: Tcl list of all requested objects references.
@@ -60,10 +62,8 @@ tcl_interp_g = None
 """ Global Tcl interpreter for Tcl based utilities. Does not log its operations. """
 
 
-def tcl_list_2_py_list(tcl_list):
-    """ Convert Tcl list to Python list using Tcl interpreter.
-
-    This function supports only simple lists and list of lists, not further.
+def tcl_list_2_py_list(tcl_list: str) -> List:
+    """ Convert Tcl [embedded] list to Python [embedded] list using Tcl interpreter.
 
     :param str tcl_list: string representing the Tcl list.
     :return: Python list equivalent to the Tcl list.
@@ -80,7 +80,9 @@ def tcl_list_2_py_list(tcl_list):
             python_list = tcl_interp_g.eval('join ' + tcl_list + ' LiStSeP').split('LiStSeP')
         except Exception as _:
             python_list = tcl_interp_g.eval('join ' + tcl_str(tcl_list) + ' LiStSeP').split('LiStSeP')
-        return [e.split() for e in python_list] if tcl_list[0:2] == '{{' else python_list
+        if len([i for i in python_list if '{' in i]) == 0:
+            return python_list
+        return [tcl_list_2_py_list(e) for e in python_list]
 
 
 def py_list_to_tcl_list(py_list):
@@ -95,7 +97,7 @@ def py_list_to_tcl_list(py_list):
     return tcl_str(tcl_interp_g.eval('split' + tcl_str('\t'.join(py_list_str)) + '\\t'))
 
 
-class TgnTk(object):
+class TgnTk:
     """ Native Python Tk interpreter. """
 
     def __init__(self):
@@ -142,7 +144,7 @@ class TgnTkMultithread(Thread):
         return rc
 
 
-class TgnTclConsole(object):
+class TgnTclConsole:
     """ Tcl interpreter over console.
 
     Current implementation is a sample extracted from actual project where the console is telnet to Windows machine.
@@ -185,10 +187,10 @@ class TgnTclConsole(object):
         self._con.send_cmd('exit')
 
 
-class TgnTclWrapper(object):
+class TgnTclWrapper:
     """ Tcl connectivity for TGN projects. """
 
-    def __init__(self, logger, tcl_interp=None):
+    def __init__(self, logger: logging.Logger, tcl_interp=None):
         """ Init Python Tk package.
 
         Add logger to log Tcl commands only.

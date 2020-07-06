@@ -37,9 +37,8 @@ def test_list(tcl):
     tcl_list = '{{a} {b b}}'
     python_list = tcl_list_2_py_list(tcl_list)
     assert len(python_list) == 2
-    assert type(python_list[0]) is list
-    assert type(python_list[1]) is list
-    assert len(python_list[1]) == 2
+    assert type(python_list[0]) is str
+    assert type(python_list[1]) is str
 
     tcl_list = ''
     assert len(tcl_list_2_py_list(tcl_list)) == 0
