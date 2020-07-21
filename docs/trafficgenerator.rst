@@ -1,13 +1,6 @@
 trafficgenerator package
 ========================
 
-Subpackages
------------
-
-.. toctree::
-
-    trafficgenerator.test
-
 Submodules
 ----------
 

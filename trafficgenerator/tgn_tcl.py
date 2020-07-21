@@ -2,14 +2,14 @@
 Base class and utilities for TGN Python Tcl wrapper.
 """
 
-from os import path
-import logging
-import time
-import re
-from threading import Thread
-from queue import Queue
 import json
-from typing import Dict, List
+import logging
+import re
+import time
+from os import path
+from queue import Queue
+from threading import Thread
+from typing import Dict, List, Optional
 
 from trafficgenerator.tgn_utils import new_log_file
 from trafficgenerator.tgn_object import TgnObject
@@ -18,56 +18,50 @@ from trafficgenerator.tgn_object import TgnObject
 # some Linux installations). If Tcl interpreter is required and not installed it will fail anyway...
 try:
     from tkinter import Tcl
-except Exception as _:
+except ModuleNotFoundError as _:
     pass
 
 
-def tcl_str(string: str = '') -> str:
-    """
-    :param string: Python string.
-    :returns: Tcl string surrounded by {}.
-    """
+tcl_interp_g: Optional[Tcl] = None
+""" Global Tcl interpreter for Tcl based utilities. Does not log its operations. """
 
+
+def tcl_str(string: str = '') -> str:
+    """ Returns Tcl string surrounded by {}
+
+    :param string: Python string.
+    """
     return ' {' + string + '} '
 
 
 def tcl_file_name(name: str) -> str:
-    """
-    :param name: file name.
-    :returns: normalized file name with forward slashes.
-    """
+    """ Returns normalized file name with forward slashes.
 
+    :param name: file name.
+    """
     return tcl_str(path.normpath(name).replace('\\', '/'))
 
 
 def get_args_pairs(arguments: Dict[str, object]) -> str:
-    """
-    :param arguments: Python dictionary of TGN API command arguments <key, value>.
-    :returns: Tcl list of argument pairs <-key, value> to be used in TGN API commands.
-    """
+    """ Returns Tcl list of argument pairs <-key, value> to be used in TGN API commands.
 
+    :param arguments: Python dictionary of TGN API command arguments <key, value>.
+    """
     return ' '.join(' '.join(['-' + k, tcl_str(str(v))]) for k, v in arguments.items())
 
 
 def build_obj_ref_list(objects: List[TgnObject]) -> str:
-    """
-    :param objects: Python list of requested objects.
-    :returns: Tcl list of all requested objects references.
-    """
+    """ Returns Tcl list of all requested objects references.
 
+    :param objects: Python list of requested objects.
+    """
     return ' '.join([o.ref for o in objects])
 
 
-tcl_interp_g = None
-""" Global Tcl interpreter for Tcl based utilities. Does not log its operations. """
-
-
-def tcl_list_2_py_list(tcl_list: str) -> List:
-    """ Convert Tcl [embedded] list to Python [embedded] list using Tcl interpreter.
+def tcl_list_2_py_list(tcl_list: str) -> list:
+    """ Recursievely convert embedded Tcl list to embedded Python list using Tcl interpreter.
 
     :param str tcl_list: string representing the Tcl list.
-    :return: Python list equivalent to the Tcl list.
-    :rtye: list
     """
 
     if not tcl_list:
@@ -85,14 +79,11 @@ def tcl_list_2_py_list(tcl_list: str) -> List:
         return [tcl_list_2_py_list(e) for e in python_list]
 
 
-def py_list_to_tcl_list(py_list):
+def py_list_to_tcl_list(py_list: list) -> str:
     """ Convert Python list to Tcl list using Tcl interpreter.
 
     :param py_list: Python list.
-    :type py_list: list
-    :return: string representing the Tcl string equivalent to the Python list.
     """
-
     py_list_str = [str(s) for s in py_list]
     return tcl_str(tcl_interp_g.eval('split' + tcl_str('\t'.join(py_list_str)) + '\\t'))
 
@@ -161,17 +152,15 @@ class TgnTclConsole:
         self._con.set_prompt_match_expression('% ')
         self._con.send_cmd(tcl_exe)
 
-    def eval(self, command):
-        """
-        @summary: Evaluate Tcl command.
+    def eval(self, command: str) -> str:
+        """ Evaluate Tcl command.
 
-        @param command: command to evaluate.
-        @return: command output.
+        :param command: command to evaluate.
         """
         # Some operations (like take ownership) may take long time.
         con_command_out = self._con.send_cmd(command, timeout=256)
         if 'ERROR_SEND_CMD_EXIT_DUE_TO_TIMEOUT' in con_command_out:
-            raise Exception('{} - command timeout'.format(command))
+            raise Exception(f'{command} - command timeout')
         command = command.replace('\\', '/')
         con_command_out = con_command_out.replace('\\', '/')
         command = command.replace('(', r'\(').replace(')', r'\)')

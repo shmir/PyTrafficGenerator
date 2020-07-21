@@ -1,8 +1,15 @@
 -r requirements.txt
 
+# Testing
 pytest
 pytest-cov
 tox
 
+# Packaging
 wheel
 setuptools-scm
+
+# Documentation
+sphinx
+sphinx_rtd_theme
+pygments

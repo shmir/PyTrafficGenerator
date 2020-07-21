@@ -3,10 +3,10 @@ Base class and utilities for all TGN objects.
 """
 
 from __future__ import annotations
-from collections import OrderedDict
 import gc
-from abc import ABC, abstractmethod
 import json
+from abc import ABC, abstractmethod
+from collections import OrderedDict
 from typing import Type, List, Dict, Optional
 
 from trafficgenerator.tgn_utils import TgnError
@@ -80,7 +80,7 @@ class TgnObject(ABC):
     objects = OrderedDict()
     """ Dictionary of child objects <object reference: object name>. """
 
-    def __init__(self, parent: Optional[TgnObject], **data):
+    def __init__(self, parent: Optional[TgnObject], **data: str) -> None:
         """ Create new TGN object in the API.
 
         If object does not exist on the chassis, create it on the chassis as well.
@@ -104,13 +104,13 @@ class TgnObject(ABC):
             # todo: make sure each object has parent and test only for None parents (STC project and IXN root).
             self._data['parent'].objects[self.ref] = self
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
-    def get_child(self, *types):
-        """
+    def get_child(self, *types: str) -> Optional[TgnObject]:
+        """ Returns the first (and for most useful cases only) child of the requested type(s).
+
         :param types: list of requested types.
-        :return: the first (and in most useful cases only) child of specific type(s).
         """
         children = list(self.get_children(*types))
         return children[0] if children else None
@@ -287,7 +287,7 @@ class TgnObject(ABC):
 
         In some TGs (IxNetwork, STC, IxLoad...) the reference is maintained by the TG itself and is used for API calls.
         In others (Xena, TRex...) the reference is maintained by the TG package and may (Xena REST) or may not be used
-            for API calls.
+        for API calls.
         If the reference is not used for API calls, use index or relative index for API calls.
 
         :return: object reference.
