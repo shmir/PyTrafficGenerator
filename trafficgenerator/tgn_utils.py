@@ -2,36 +2,42 @@
 TGN projects utilities and errors.
 """
 
+import importlib.util
 import logging
-from os import path
-from enum import Enum
 from collections.abc import Iterable
-
-
-class TgnType(Enum):
-    ixexplorer = 1
-    ixnetwork = 2
-    testcenter = 3
+from enum import Enum
+from os import path
+from types import ModuleType
 
 
 class ApiType(Enum):
+    """ List TGN API types. """
     tcl = 1
     python = 2
     rest = 3
     socket = 4
 
 
-def flatten(x):
+class TgnError(Exception):
+    """ Base exception for traffic generator exceptions. """
+    pass
+
+
+def flatten(x: list) -> list:
+    """ Recursievely flatten embedded list into single list.
+
+    :param x: list to flatten.
+    """
     if isinstance(x, Iterable):
         return [a for i in x for a in flatten(i)]
     else:
         return [x]
 
 
-def is_true(str_value):
-    """
+def is_true(str_value: str) -> bool:
+    """ Returns True if string represents True TGN attribute value else return False.
+
     :param str_value: String to evaluate.
-    :returns: True if string represents True TGN attribute value else return False.
     """
     return str_value.lower() in ('true', 'yes', '1', '::ixnet::ok')
 
@@ -102,6 +108,12 @@ def new_log_file(logger, suffix, file_type='tcl'):
     return new_logger
 
 
-class TgnError(Exception):
-    """ Base exception for traffic generator exceptions. """
-    pass
+def get_test_config(test_config_path: str) -> ModuleType:
+    """ Import tests configuration modeule from path.
+
+    :param test_config_path: Full path to test configuration module.
+    """
+    spec = importlib.util.spec_from_file_location('test_config', test_config_path)
+    test_config = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(test_config)
+    return test_config
