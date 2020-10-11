@@ -5,7 +5,7 @@ Base classes and utilities for TGN applications classes.
 """
 
 
-class TgnApp(object):
+class TgnApp:
     """ Base class for all TGN applications classes. """
 
     def __init__(self, logger, api_wrapper):
