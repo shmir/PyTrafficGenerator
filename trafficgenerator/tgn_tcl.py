@@ -18,12 +18,10 @@ from trafficgenerator.tgn_object import TgnObject
 # some Linux installations). If Tcl interpreter is required and not installed it will fail anyway...
 try:
     from tkinter import Tcl
+    tcl_interp_g: Optional[Tcl] = None
+    """ Global Tcl interpreter for Tcl based utilities. Does not log its operations. """
 except ModuleNotFoundError as _:
     pass
-
-
-tcl_interp_g: Optional[Tcl] = None
-""" Global Tcl interpreter for Tcl based utilities. Does not log its operations. """
 
 
 def tcl_str(string: str = '') -> str:
