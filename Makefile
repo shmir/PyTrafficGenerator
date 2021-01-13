@@ -10,6 +10,7 @@ user=pypiadmin
 password=pypiadmin
 
 help:
+	@echo 'install: install pip requirements'
 	@echo 'build: build the package'
 	@echo 'upload: create and upload the package to local pypi index'
 	@echo '        takes the following params:'
@@ -18,7 +19,7 @@ help:
 	@echo '        password=user password, default pypiadmin'
 
 install:
-	pip install -i http://$(repo):8036 --trusted-host $(repo) -U --pre --use-feature=2020-resolver -r requirements-dev.txt
+	pip install -U -r requirements-dev.txt
 
 .PHONY: build
 build:

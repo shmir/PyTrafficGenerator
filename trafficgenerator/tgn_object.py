@@ -338,7 +338,7 @@ class TgnObject(ABC):
         children_objs = OrderedDict()
         child_obj_type = self.get_obj_class(child_type)
         for child in (c for c in children if c != ''):
-            child_object = child_obj_type(objRef=child, objType=child_type, parent=self)
+            child_object = child_obj_type(parent=self, objRef=child, objType=child_type)
             child_object._set_data(name=child_object.get_name())
             children_objs[child_object.obj_ref()] = child_object
         self.objects.update(children_objs)
