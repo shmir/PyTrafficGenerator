@@ -8,6 +8,7 @@ tox
 # Packaging
 wheel
 setuptools-scm
+twine
 
 # Documentation
 sphinx
