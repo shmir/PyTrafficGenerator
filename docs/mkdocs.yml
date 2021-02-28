@@ -1,0 +1,13 @@
+site_name: PyTrafficGen Documentation
+
+site_name: pytrafficgen
+site_url: https://pytrafficgenerator.readthedocs.io/en/latest/
+site_description: Documentation for PyTrafficGen project.
+site_author: yoram@ignissoft.com
+
+nav:
+  - Getting Started: getting_started.md
+  - Style guide: style.md
+
+plugins:
+  - search

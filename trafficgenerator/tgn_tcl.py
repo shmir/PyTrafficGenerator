@@ -1,7 +1,6 @@
 """
 Base class and utilities for TGN Python Tcl wrapper.
 """
-
 import json
 import logging
 import re

@@ -1,7 +1,6 @@
 """
 Base class and utilities for all TGN objects.
 """
-
 from __future__ import annotations
 import gc
 import json
@@ -30,7 +29,7 @@ class TgnObjectsDict(OrderedDict):
 
     def __setitem__(self, key, value):
         if not isinstance(key, TgnObject):
-            raise TgnError('tgn_object_dict keys must be TgnObject, not {}'.format(type(key)))
+            raise TgnError(f'tgn_object_dict keys must be TgnObject, not {type(key)}')
         return OrderedDict.__setitem__(self, key, value)
 
     def __getitem__(self, key):
@@ -46,7 +45,6 @@ class TgnObjectsDict(OrderedDict):
 
         :param indent: indentation level.
         """
-
         str_keys_dict = OrderedDict({str(k): v for k, v in self.items()})
         for k, v in str_keys_dict.items():
             if isinstance(v, dict):
@@ -66,8 +64,8 @@ class TgnSubStatsDict(TgnObjectsDict):
     """
 
     def __getitem__(self, key):
-        if super(self.__class__, self).__getitem__(key) is not None:
-            return super(self.__class__, self).__getitem__(key)
+        if super().__getitem__(key) is not None:
+            return super().__getitem__(key)
         else:
             if len(self) > 1:
                 raise KeyError('multiple values')
@@ -80,7 +78,7 @@ class TgnObject(ABC):
     objects = OrderedDict()
     """ Dictionary of child objects <object reference: object name>. """
 
-    def __init__(self, parent: Optional[TgnObject], **data: str) -> None:
+    def __init__(self, parent: TgnObject, **data: str) -> None:
         """ Create new TGN object in the API.
 
         If object does not exist on the chassis, create it on the chassis as well.
@@ -148,18 +146,16 @@ class TgnObject(ABC):
         Use this method for fast access to objects in case of static configurations.
 
         :param types: requested object types.
-        :return: all children of the specified types.
         """
-
         if not types:
             return list(self.objects.values())
         types_l = [o.lower() for o in types]
         return [o for o in self.objects.values() if o.type.lower() in types_l]
 
-    def get_object_by_type(self, *types):
-        """
+    def get_object_by_type(self, *types: str) -> Optional[TgnObject]:
+        """ Return the first child object stored in memory (without re-reading them from the TGN).
+
         :param types: requested object types.
-        :return: the child of the specified types.
         """
         children = self.get_objects_by_type(*types)
         return children[0] if any(children) else None

@@ -1,4 +1,6 @@
-
+"""
+Shared utilities for pytest conftest.
+"""
 import logging
 import sys
 from pathlib import Path
@@ -33,7 +35,8 @@ def tgn_pytest_addoption(parser: Parser, tgn_config: str) -> None:
 
 def pytest_generate_tests(metafunc: Metafunc) -> None:
     """ Generate tests for each API and server from pytest options. """
-    metafunc.parametrize('api', metafunc.config.getoption('--tgn-api'), indirect=True)
+    if 'api' in metafunc.fixturenames:
+        metafunc.parametrize('api', metafunc.config.getoption('--tgn-api'), indirect=True)
     metafunc.parametrize('server', metafunc.config.getoption('--tgn-server'), indirect=True)
 
 

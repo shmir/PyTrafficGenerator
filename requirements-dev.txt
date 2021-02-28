@@ -11,6 +11,4 @@ setuptools-scm
 twine
 
 # Documentation
-sphinx
-sphinx_rtd_theme
-pygments
+mkdocs
