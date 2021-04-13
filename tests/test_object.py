@@ -1,31 +1,31 @@
 """
 Tests for basic TGN object operations.
 """
-from typing import Type, List, Dict
+from typing import Dict, List, Type
 
 import pytest
 
-from trafficgenerator.tgn_utils import is_false, is_true, is_local_host, is_ip, flatten, TgnError
 from trafficgenerator.tgn_app import TgnApp
 from trafficgenerator.tgn_object import TgnObject, TgnObjectsDict, TgnSubStatsDict
+from trafficgenerator.tgn_utils import TgnError, flatten, is_false, is_ip, is_local_host, is_true
 
 
 @pytest.fixture()
 def root():
     """ Yields dummy objects hierarchy. """
-    root = TestObject(objRef='root1', objType='root', parent=None)
+    root = TgnTestObject(objRef='root1', objType='root', parent=None)
     root.api = None
     root.logger = None
-    root.leaf1 = TestObject(objRef='leaf1', objType='leaf', parent=root)
-    root.node1 = TestObject(objRef='node1', objType='node', parent=root, name='name1')
-    root.node2 = TestObject(objRef='node2', objType='node', parent=root, name='name2')
-    root.node1.node11 = TestObject(objRef='node11', objType='node', parent=root.node1, name='name11')
-    root.node1.node12 = TestObject(objRef='node12', objType='node', parent=root.node1, name='name12')
-    root.node1.leaf11 = TestObject(objRef='leaf11', objType='leaf', parent=root.node1)
+    root.leaf1 = TgnTestObject(objRef='leaf1', objType='leaf', parent=root)
+    root.node1 = TgnTestObject(objRef='node1', objType='node', parent=root, name='name1')
+    root.node2 = TgnTestObject(objRef='node2', objType='node', parent=root, name='name2')
+    root.node1.node11 = TgnTestObject(objRef='node11', objType='node', parent=root.node1, name='name11')
+    root.node1.node12 = TgnTestObject(objRef='node12', objType='node', parent=root.node1, name='name12')
+    root.node1.leaf11 = TgnTestObject(objRef='leaf11', objType='leaf', parent=root.node1)
     yield root
 
 
-class TestObject(TgnObject):
+class TgnTestObject(TgnObject):
     """ Mock test object. """
 
     def get_attributes(self) -> Dict[str, str]:

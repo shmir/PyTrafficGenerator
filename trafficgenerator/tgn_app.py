@@ -2,6 +2,7 @@
 Base classes and utilities for TGN applications classes.
 """
 import logging
+
 from trafficgenerator.tgn_utils import ApiType
 
 
