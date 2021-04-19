@@ -1,3 +1,6 @@
+[![Python 3.7|3.8|3.9](https://img.shields.io/badge/python-3.7%7C3.8%7C.3.9-blue.svg)](https://www.python.org/downloads/release/downloads/)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+![Build status](https://github.com/shmir/PyTrafficGenerator/actions/workflows/python-package.yml/badge.svg?branch=dev)
 
 Base Python OO API for traffic generators (Ixia, Spirent, Xena, TRex etc.).
 
