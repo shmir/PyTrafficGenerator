@@ -2,9 +2,6 @@
 # Makefile to build and upload to local pypi servers.
 # To upload to pypi.org use plain twine upload.
 #
-# todo: add support to upload to pypi.
-# todo: add support to install from pypi.
-#
 
 repo=localhost
 user=pypiadmin
