@@ -58,23 +58,23 @@ def build_obj_ref_list(objects: List[TgnObject]) -> str:
     return " ".join([o.ref for o in objects])
 
 
-def tcl_list_2_py_list(tcl_list: str) -> list:
-    """Recursievely convert embedded Tcl list to embedded Python list using Tcl interpreter.
+def tcl_list_2_py_list(tcl_list: str, within_tcl_str=False) -> list:
+    """ Recursievely convert embedded Tcl list to embedded Python list using Tcl interpreter.
 
     :param str tcl_list: string representing the Tcl list.
     """
 
     if not tcl_list:
         return []
-
+    #return tcl_interp_g.eval('join ' + tcl_list + ' LiStSeP').split('LiStSeP') if tcl_list else []
     try:
         return json.loads(tcl_list)
-    except json.decoder.JSONDecodeError:
+    except Exception as _:
         try:
-            python_list = tcl_interp_g.eval("join " + tcl_list + " LiStSeP").split("LiStSeP")
-        except TclError:
-            python_list = tcl_interp_g.eval("join " + tcl_str(tcl_list) + " LiStSeP").split("LiStSeP")
-        if len([i for i in python_list if "{" in i]) == 0:
+            python_list = tcl_interp_g.eval('join ' + tcl_list + ' LiStSeP').split('LiStSeP')
+        except Exception as _:
+            python_list = tcl_interp_g.eval('join ' + tcl_str(tcl_list) + ' LiStSeP').split('LiStSeP')
+        if len([i for i in python_list if '{' in i]) == 0 or within_tcl_str:
             return python_list
         return [tcl_list_2_py_list(e) for e in python_list]
 
