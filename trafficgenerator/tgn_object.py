@@ -120,25 +120,26 @@ class TgnObject(ABC):
 
         :param obj_ref: requested object reference.
         """
-        return self._get_object_by_key("objRef", _wa_norm_obj_ref(obj_ref))
+        return self.get_object_by_key("objRef", _wa_norm_obj_ref(obj_ref))
 
     def get_object_by_name(self, obj_name: str) -> TgnObject:
         """Returns the first object with the requested object name in the object branch.
 
         :param obj_name: requested object name.
         """
-        return self._get_object_by_key("name", obj_name)
+        return self.get_object_by_key("name", obj_name)
 
-    def _get_object_by_key(self, key, value, *types):
-        if self._data[key] == value and (types and self.ref in types or not types):
+    def get_object_by_key(self, key: str, value: object) -> Optional[TgnObject]:
+        """Returns the first object with the requested key/value in the object branch.
+
+        :param key: Requested object key.
+        :param value: Requested object value.
+        """
+        if self._data[key] == value:
             return self
         else:
-            if not types:
-                children = self.objects.values()
-            else:
-                children = self.get_objects_by_type(*types)
-            for child in children:
-                obj = child._get_object_by_key(key, value, *types)
+            for child in self.objects.values():
+                obj = child.get_object_by_key(key, value)
                 if obj is not None:
                     return obj
         return None
@@ -292,7 +293,7 @@ class TgnObject(ABC):
         """
         return self._data["objType"]
 
-    type = property(obj_type)
+    type = property(obj_type)  # noqa: A003
 
     def obj_parent(self) -> TgnObject:
         """
@@ -320,7 +321,7 @@ class TgnObject(ABC):
         """
         return int(self.index.split("/", maxsplit=1)[-1]) if self.index else None
 
-    id = property(obj_id)
+    id = property(obj_id)  # noqa: A003
 
     #
     # Private methods.
@@ -334,7 +335,7 @@ class TgnObject(ABC):
         child_obj_type = self.get_obj_class(child_type)
         for child in (c for c in children if c != ""):
             child_object = child_obj_type(parent=self, objRef=child, objType=child_type)
-            child_object._set_data(name=child_object.get_name())
+            child_object._set_data(name=child_object.get_name())  # pylint: disable=protected-access
             children_objs[child_object.obj_ref()] = child_object
         self.objects.update(children_objs)
         return children_objs

@@ -1,12 +1,13 @@
 """
 Tests for TGN Tcl wrapper - the default wrapper.
 """
+# pylint: disable=redefined-outer-name
 import logging
 import sys
 
 import pytest
 
-from trafficgenerator.tgn_tcl import TgnTclWrapper, TgnTkThread, py_list_to_tcl_list, tcl_file_name, tcl_list_2_py_list
+from trafficgenerator.tgn_tcl import TgnTclWrapper, py_list_to_tcl_list, tcl_file_name, tcl_list_2_py_list
 
 
 @pytest.fixture(scope="session")
@@ -19,19 +20,12 @@ def logger() -> logging.Logger:
 
 
 @pytest.fixture
-def tcl(logger):
-    yield TgnTclWrapper(logger)
+def tcl(logger: logging.Logger) -> TgnTclWrapper:
+    """Yields TgnTclWrapper."""
+    return TgnTclWrapper(logger)
 
 
-@pytest.fixture
-def multi_thread_tcl(logger):
-    tcl_interp = TgnTkThread()
-    tcl_interp.start()
-    yield TgnTclWrapper(logger, tcl_interp)
-    tcl_interp.stop()
-
-
-def test_list(tcl):
+def test_list(tcl: TgnTclWrapper) -> None:
     """Test Python->Tcl and Tcl->Python list conversion."""
     py_list = ["a", "b b"]
     tcl_list_length = tcl.eval("llength " + py_list_to_tcl_list(py_list))
@@ -66,9 +60,3 @@ def test_list(tcl):
 def test_file_name():
     """Test Tcl file names normalization."""
     assert tcl_file_name("a\\b/c").strip() == "{a/b/c}"
-
-
-@pytest.mark.skip("Throws Tcl_AsyncDelete: async handler deleted by the wrong thread which fails tox.")
-def test_puts(multi_thread_tcl):
-    """Test multi threaded Tcl."""
-    assert multi_thread_tcl.eval('set dummy "hello world"') == "hello world"

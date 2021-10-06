@@ -40,5 +40,5 @@ repos:
           --max-public-methods=32,
           --max-args=8,
           '--disable=too-few-public-methods,logging-fstring-interpolation,too-many-instance-attributes,no-else-return,too-many-locals,no-self-use,duplicate-code,broad-except,logging-not-lazy,unspecified-encoding',
-          '--good-names=ip,rc'
+          '--good-names=ip,rc,eval'
         ]
