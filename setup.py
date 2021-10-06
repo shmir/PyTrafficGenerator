@@ -1,19 +1,17 @@
 #!/usr/bin/env python
 # encoding: utf-8
-
 """
 Package PyTrafficGenerator for distribution.
 """
-
 from setuptools import find_packages, setup
 
 
 def main():
-
-    with open("requirements.txt") as f:
-        install_requires = f.read().splitlines()
-    with open("README.md") as f:
-        long_description = f.read()
+    """Packaging script."""
+    with open("requirements.txt", "r") as requirements:
+        install_requires = requirements.read().splitlines()
+    with open("README.md", "r") as readme:
+        long_description = readme.read()
 
     setup(
         name="pytrafficgen",

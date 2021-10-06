@@ -1,6 +1,7 @@
 """
 Shared utilities for pytest conftest.
 """
+# pylint: disable=redefined-outer-name
 import logging
 import sys
 from pathlib import Path

@@ -1,9 +1,21 @@
 """
 Tests for TGN Tcl wrapper - the default wrapper.
 """
+import logging
+import sys
+
 import pytest
 
 from trafficgenerator.tgn_tcl import TgnTclWrapper, TgnTkThread, py_list_to_tcl_list, tcl_file_name, tcl_list_2_py_list
+
+
+@pytest.fixture(scope="session")
+def logger() -> logging.Logger:
+    """Yields logger for package regression testing."""
+    logger = logging.getLogger("tgn")
+    logger.setLevel(logging.DEBUG)
+    logger.addHandler(logging.StreamHandler(sys.stdout))
+    yield logger
 
 
 @pytest.fixture
@@ -20,8 +32,7 @@ def multi_thread_tcl(logger):
 
 
 def test_list(tcl):
-    """ Test Python->Tcl and Tcl->Python list conversion. """
-
+    """Test Python->Tcl and Tcl->Python list conversion."""
     py_list = ["a", "b b"]
     tcl_list_length = tcl.eval("llength " + py_list_to_tcl_list(py_list))
     assert int(tcl_list_length) == 2
@@ -29,14 +40,18 @@ def test_list(tcl):
     tcl_list = "{a} {b b}"
     python_list = tcl_list_2_py_list(tcl_list)
     assert len(python_list) == 2
-    assert type(python_list[0]) is str
-    assert type(python_list[1]) is str
+    assert isinstance(python_list[0], str)
+    assert isinstance(python_list[1], str)
 
     tcl_list = "{{a} {b b}}"
     python_list = tcl_list_2_py_list(tcl_list)
     assert len(python_list) == 2
-    assert type(python_list[0]) is str
-    assert type(python_list[1]) is str
+    assert isinstance(python_list[0], str)
+    assert isinstance(python_list[1], str)
+
+    tcl_list = '{{"a" "b b"}}'
+    python_list = tcl_list_2_py_list(tcl_list)
+    assert len(python_list) == 1
 
     tcl_list = ""
     assert len(tcl_list_2_py_list(tcl_list)) == 0
@@ -49,11 +64,11 @@ def test_list(tcl):
 
 
 def test_file_name():
-    """ Test Tcl file names normalization. """
+    """Test Tcl file names normalization."""
     assert tcl_file_name("a\\b/c").strip() == "{a/b/c}"
 
 
 @pytest.mark.skip("Throws Tcl_AsyncDelete: async handler deleted by the wrong thread which fails tox.")
 def test_puts(multi_thread_tcl):
-    """ Test multi threaded Tcl """
+    """Test multi threaded Tcl."""
     assert multi_thread_tcl.eval('set dummy "hello world"') == "hello world"

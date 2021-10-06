@@ -13,6 +13,7 @@ from typing import Optional
 class ApiType(Enum):
     """ List TGN API types. """
 
+    # pylint: disable=invalid-name
     tcl = 1
     python = 2
     rest = 3
@@ -22,18 +23,16 @@ class ApiType(Enum):
 class TgnError(Exception):
     """ Base exception for traffic generator exceptions. """
 
-    pass
 
+def flatten(ml_list: list) -> list:
+    """Recursievely flatten lists of lists into single list.
 
-def flatten(x: list) -> list:
-    """Recursievely flatten embedded list into single list.
-
-    :param x: list to flatten.
+    :param ml_list: Multi-level list to flatten.
     """
-    if isinstance(x, Iterable):
-        return [a for i in x for a in flatten(i)]
+    if isinstance(ml_list, Iterable):
+        return [a for i in ml_list for a in flatten(i)]
     else:
-        return [x]
+        return [ml_list]
 
 
 def is_true(str_value: str) -> bool:

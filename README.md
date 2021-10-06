@@ -24,10 +24,12 @@ To get pytrafficgen for developers, just clone it
 $ git clone https://github.com/shmir/PyTrafficGenerator.git
 ```
 
-To upload a new version to local pypi::
+To upload a new version to local pypi:
 ```bash
 $ make upload repo=REPO user=USER_NAME password=PASSWORD
 ```
+
+Publishing to pypi is performed by GitHub workflow.
 
 Documentation
 -------------

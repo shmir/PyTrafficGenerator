@@ -1,3 +1,3 @@
-""""
-@author: yoram.shamir
+"""
+Tests for pytrafficgen.
 """

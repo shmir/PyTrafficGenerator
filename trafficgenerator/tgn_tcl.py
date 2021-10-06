@@ -27,7 +27,7 @@ except ModuleNotFoundError:
 
 
 def tcl_str(string: str = "") -> str:
-    """Returns Tcl string surrounded by {}
+    """Returns Tcl string surrounded by {}.
 
     :param string: Python string.
     """
@@ -63,7 +63,6 @@ def tcl_list_2_py_list(tcl_list: str) -> list:
 
     :param str tcl_list: string representing the Tcl list.
     """
-
     if not tcl_list:
         return []
 
@@ -118,8 +117,8 @@ class TgnTkThread(Thread):
                 try:
                     rc = self.tcl.eval(command)
                     self.out_q.put(rc)
-                except Exception as e:
-                    self.out_q.put(e)
+                except Exception as err:
+                    self.out_q.put(err)
             time.sleep(1)
 
     def stop(self):
@@ -165,8 +164,7 @@ class TgnTclConsole:
         con_command_out = con_command_out.replace("\\", "/")
         command = command.replace("(", r"\(").replace(")", r"\)")
         command = command.replace("{", r"\{").replace("}", r"\}")
-        m = re.search(command + "(.*)" + "%", con_command_out, re.DOTALL)
-        command_out = m.group(1).strip()
+        command_out = re.search(command + "(.*)" + "%", con_command_out, re.DOTALL).group(1).strip()
         if "couldn't read file" in command_out or "RuntimeError" in command_out:
             raise TclError(command_out)
         return command_out
@@ -179,7 +177,7 @@ class TgnTclConsole:
 class TgnTclWrapper:
     """ Tcl connectivity for TGN projects. """
 
-    def __init__(self, logger: logging.Logger, tcl_interp=None):
+    def __init__(self, logger: logging.Logger, tcl_interp=None) -> None:
         """Init Python Tk package.
 
         Add logger to log Tcl commands only.
@@ -187,7 +185,6 @@ class TgnTclWrapper:
         We assume that there might have both multiple Tcl sessions simultaneously so we add suffix to create
         multiple distinguished Tcl scripts.
         """
-
         if not logger:
             logger = logging.getLogger("dummy")
         self.logger = logger
@@ -201,7 +198,7 @@ class TgnTclWrapper:
         tcl_interp_g = self.tcl_interp
         self.rc = None
 
-    def eval(self, command):
+    def eval(self, command: str) -> str:
         """Execute Tcl command.
 
         Write the command to tcl script (.tcl) log file.
@@ -211,7 +208,6 @@ class TgnTclWrapper:
         :param command: Command to execute.
         :returns: command raw output.
         """
-
         if self.logger.handlers:
             self.logger.debug(command)
         if self.tcl_script:
@@ -221,5 +217,6 @@ class TgnTclWrapper:
             self.logger.debug("\t" + self.rc)
         return self.rc
 
-    def source(self, script_file):
+    def source(self, script_file: str) -> None:
+        """Tcl source command."""
         self.eval("source " + tcl_file_name(script_file))
