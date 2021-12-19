@@ -3,9 +3,10 @@
 # Testing
 pytest
 pytest-cov
-pytest-flake8
-pytest-isort
 tox
+
+pre-commit
+pylint
 
 # Packaging
 wheel
@@ -14,6 +15,5 @@ twine
 
 # Documentation
 mkdocs
-
-pre-commit
-pylint
+mkdocs-material
+mkdocstrings

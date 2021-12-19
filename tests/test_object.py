@@ -3,7 +3,7 @@ Tests for basic TGN object operations.
 """
 # pylint: disable=redefined-outer-name
 import logging
-from typing import Dict, List, Type
+from typing import Dict, Iterable, List, Type
 
 import pytest
 
@@ -41,7 +41,7 @@ class TgnTestObject(TgnObject):
 
 
 @pytest.fixture()
-def tgn_object() -> TgnTestObject:
+def tgn_object() -> Iterable[TgnTestObject]:
     """ Yields dummy objects hierarchy. """
     # pylint: disable=attribute-defined-outside-init
     tgn_object = TgnTestObject(parent=None, objRef="root1", objType="root")

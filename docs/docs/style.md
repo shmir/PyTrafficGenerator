@@ -4,24 +4,19 @@ Style Guide
 As we all know, python is very stylish language.
 So first, we follow [PEP 8](https://www.python.org/dev/peps/pep-0008/) and [PEP 257](https://www.python.org/dev/peps/pep-0257/).
 
-Where this style guide conflicts with the PEPs - **fix the style guide**.
+Second, to avoid long philosophical debates over style, and minimize style diffs, we use [black formatter](https://github.com/psf/black).
+Then we also use [isort](https://pycqa.github.io/isort/) to keep our imports in order.
+And finally, we use [sonarlint](https://www.sonarlint.org/), [pylint](https://pylint.org/) and [flake8](https://github.com/pycqa/flake8).
 
-Anyway, this style guide does not try to invent anything, but select one style where several pythonic options are
-available.
+After this, there is not much left :) And yet...
+
+Where this style guide conflicts with the PEPs and tools above - **fix the style guide**.
 
 Imports
 =======
-Imports should be grouped and ordered, from the general to the specific.
-There should be a blank line between groups.
-```python
-import logging
-import os
-
-import requests
-
-import trafficgenerator
-```
 Do not use relative imports.
+
+Other than this, just let [isort](https://pycqa.github.io/isort/) order your imports.
 
 Methods ordering
 ================
@@ -63,21 +58,15 @@ class MyClass:
         pass
 ```
 
-Strings and Docstrings
-======================
-Use single quotes ('') for strings and double-quotes ("") for docstrings.
-
-The summary line should be in the the same line as the opening quotes. Add one space between the quotes and the line.
-
-Remove the docstring, this is a standard pytest method name, and you do not need to document it, especially when your docstring does not explain much.
-
+Docstrings
+==========
 Do not shout, please use only lowercase and try to refrain from using exclamation marks and ellipses.
 
 Comments
 ========
 The golden rule for comments is - More is less.
 
-The code should be self-explanatory and comments should be used only the explain the `WHY` and `WHAT`, the `HOW` should
+The code should be self-explanatory and comments should be used only to explain the `WHY` and `WHAT`, the `HOW` should
 be clear from the code.
 
 Try to limit the comment to one line.
@@ -90,7 +79,7 @@ Do not shout, please use only lowercase and try to refrain from using exclamatio
 
 Line breaks
 ===========
-Please refrain from using `\\`. Break long lines on commas, dots, etc.
+Please refrain from using `\\`. Let [black](https://github.com/psf/black) break lines for you.
 
 Type hints
 ==========

@@ -1,0 +1,13 @@
+site_name: PyTrafficGenerator
+
+nav:
+  - Getting Started: getting_started.md
+  - Style guide: style.md
+  - Source: source.md
+
+theme:
+  name: "material"
+
+plugins:
+- search
+- mkdocstrings
