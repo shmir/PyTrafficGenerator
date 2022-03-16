@@ -17,7 +17,7 @@ from trafficgenerator.tgn_utils import TgnError
 #    For example, endpointset->sources attribute might return:
 #    vport:1/protocols/bgp/neighborRange:1.0/routeRange:1.
 # Object reference with neighborPairs (plural) instead of neighborPair (single).
-def _wa_norm_obj_ref(obj_ref):
+def _wa_norm_obj_ref(obj_ref: str) -> str:
     return obj_ref.replace(".0", "").replace("neighborPairs:", "neighborPair:")
 
 
@@ -232,7 +232,7 @@ class TgnObject(ABC):
             return self.parent.get_ancestor_object_by_type(obj_type)
 
     def del_object_from_parent(self) -> None:
-        """ Delete object from parent object. """
+        """Delete object from parent object."""
         if self.parent:
             self.parent.objects.pop(self.ref)
 
@@ -327,7 +327,7 @@ class TgnObject(ABC):
     # Private methods.
     #
 
-    def _set_data(self, **data):
+    def _set_data(self, **data: str) -> None:
         self._data.update(data)
 
     def _build_children_objs(self, child_type, children):
@@ -345,7 +345,7 @@ class TgnObject(ABC):
     #
 
     @abstractmethod
-    def _create(self, **attributes: Dict[str, object]) -> str:
+    def _create(self, **attributes: object) -> str:
         """Create new object on the chassis and return its object reference.
 
         :param attributes: additional attributes for the create command.
@@ -353,11 +353,11 @@ class TgnObject(ABC):
 
     @abstractmethod
     def get_name(self) -> str:
-        """ Get object name. """
+        """Get object name."""
 
     @abstractmethod
     def get_attributes(self) -> Dict[str, str]:
-        """ Get all attributes values. """
+        """Get all attributes values."""
 
     @abstractmethod
     def get_attribute(self, attribute: str) -> str:
@@ -393,16 +393,12 @@ class TgnObject(ABC):
 
 
 class TgnL3(ABC):
-    """ ABC for all L3 objects. """
+    """ABC for all L3 objects."""
 
     @abstractmethod
-    def ip(self):
-        """
-        :return: IP address.
-        """
+    def ip(self) -> str:
+        """Return IP address."""
 
     @abstractmethod
-    def num_ips(self):
-        """
-        :return: number of IP addresses.
-        """
+    def num_ips(self) -> int:
+        """Returns number of IP addresses."""

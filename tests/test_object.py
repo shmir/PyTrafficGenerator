@@ -13,36 +13,36 @@ from trafficgenerator.tgn_utils import ApiType, TgnError, flatten, is_false, is_
 
 
 class TgnTestObject(TgnObject):
-    """ Mock test object. """
+    """Mock test object."""
 
     def get_attributes(self) -> Dict[str, str]:
-        """ Returns object data as its attributes. """
+        """Returns object data as its attributes."""
         return self._data
 
     def get_attribute(self, attribute: str) -> str:
-        """ Returns single data entry as a single attribute. """
+        """Returns single data entry as a single attribute."""
         return self._data[attribute]
 
-    def get_children(self, *types: List[str]) -> List[TgnObject]:
-        """ Returns all objects as children. """
+    def get_children(self, *types: str) -> List[TgnObject]:
+        """Returns all objects as children."""
         return list(self.objects.values())
 
-    def _create(self, **attributes: Dict[str, object]) -> str:
-        """ todo: add implementation and test. """
+    def _create(self, **attributes: object) -> str:
+        """todo: add implementation and test."""
 
     def get_name(self) -> str:
-        """ todo: add implementation and test. """
+        """todo: add implementation and test."""
 
     def get_objects_from_attribute(self, attribute: str) -> List[TgnObject]:
-        """ todo: add implementation and test. """
+        """todo: add implementation and test."""
 
     def get_obj_class(self, obj_type: str) -> Type[TgnObject]:
-        """ todo: add implementation and test. """
+        """todo: add implementation and test."""
 
 
 @pytest.fixture()
 def tgn_object() -> Iterable[TgnTestObject]:
-    """ Yields dummy objects hierarchy. """
+    """Yields dummy objects hierarchy."""
     # pylint: disable=attribute-defined-outside-init
     tgn_object = TgnTestObject(parent=None, objRef="root1", objType="root")
     tgn_object.api = None
@@ -102,7 +102,7 @@ def test_objects_dict(tgn_object: TgnTestObject) -> None:
     objects_dict[tgn_object.node1][tgn_object.node1.leaf11] = TgnObjectsDict()
     objects_dict[tgn_object.node2] = "node 2 entry"
     with pytest.raises(TgnError) as _:
-        objects_dict.__setitem__("invalid key", "")
+        objects_dict["invalid key"] = ""
     assert objects_dict[tgn_object.node2] == "node 2 entry"
     assert objects_dict[tgn_object.node2.name] == "node 2 entry"
     assert objects_dict[tgn_object.node2.ref] == "node 2 entry"
@@ -118,12 +118,12 @@ def test_sub_dict(tgn_object: TgnTestObject) -> None:
     sub_stats_dict[tgn_object.node2] = {"c": 3, "d": 4}
     assert sub_stats_dict[tgn_object.node1]["a"] == 1
     assert sub_stats_dict[tgn_object.node2]["c"] == 3
-    with pytest.raises(KeyError) as _:
-        sub_stats_dict.__getitem__("a")
+    with pytest.raises(KeyError):
+        sub_stats_dict["a"]
 
 
 def test_true_false() -> None:
-    """ Test TGN true and false values. """
+    """Test TGN true and false values."""
     for false_stc in ("False", "false", "0", "null", "NONE", "none", "::ixnet::obj-null"):
         assert is_false(false_stc)
         assert not is_true(false_stc)
@@ -133,7 +133,7 @@ def test_true_false() -> None:
 
 
 def test_localhost() -> None:
-    """ Test TGN localhost values. """
+    """Test TGN localhost values."""
     for location in ("127.0.0.1", "localhost", "Localhost/1/1", "//(Offline)/1/1", "null"):
         assert is_local_host(location)
     for location in ("1.2.3.4", "hostname", "192.168.1.1/1/2"):
@@ -141,7 +141,7 @@ def test_localhost() -> None:
 
 
 def test_ips() -> None:
-    """ Test TGN IP values. """
+    """Test TGN IP values."""
     for ip in ("IPV4", "ipv6", "ipv4if", "IPV6IF"):
         assert is_ip(ip)
     for ip in ("mac", "bla"):

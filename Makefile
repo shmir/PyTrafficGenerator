@@ -25,6 +25,8 @@ install:
 build:
 	make test
 	rm -rf dist/*
+	rm -rf *.egg-info
+	rm -rf build
 	python setup.py bdist_wheel
 
 upload:
@@ -32,4 +34,4 @@ upload:
 	twine upload --repository-url http://$(repo):8036 --user $(user) --password $(password) dist/*
 
 test:
-	pytest --cache-clear --flake8 --isort --cov=trafficgenerator
+	pytest --cache-clear --cov=trafficgenerator

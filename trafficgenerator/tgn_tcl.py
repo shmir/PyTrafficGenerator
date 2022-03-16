@@ -84,9 +84,9 @@ def py_list_to_tcl_list(py_list: list) -> str:
 
 
 class TgnTk:
-    """ Native Python Tk interpreter. """
+    """Native Python Tk interpreter."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.tcl = Tcl()
 
     def eval(self, command: str) -> str:  # noqa: A003
@@ -95,7 +95,7 @@ class TgnTk:
 
 
 class TgnTclWrapper:
-    """ Tcl connectivity for TGN projects. """
+    """Tcl connectivity for TGN projects."""
 
     def __init__(self, logger: logging.Logger, tcl_interp: Optional[TgnTk] = None) -> None:
         """Init Python Tk package.
@@ -134,7 +134,7 @@ class TgnTclWrapper:
             self.tcl_script.info(command)
         self.rc = self.tcl_interp.eval(command)
         if self.logger.handlers:
-            self.logger.debug("\t" + self.rc)
+            self.logger.debug(f"\t{self.rc}")
         return self.rc
 
     def source(self, script_file: str) -> None:

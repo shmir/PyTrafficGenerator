@@ -46,7 +46,7 @@ def pytest_generate_tests(metafunc: Metafunc) -> None:
 
 @pytest.fixture(scope="session")
 def logger() -> logging.Logger:
-    """ Yields configured logger. """
+    """Yields configured logger."""
     logger = logging.getLogger("tgn")
     logger.setLevel(logging.DEBUG)
     logger.addHandler(logging.StreamHandler(sys.stdout))
@@ -55,17 +55,17 @@ def logger() -> logging.Logger:
 
 @pytest.fixture(scope="session")
 def api(request: SubRequest) -> Iterable[ApiType]:
-    """ Yield API type - generate tests will generate API types based on the api option. """
+    """Yield API type - generate tests will generate API types based on the api option."""
     yield ApiType[request.param]
 
 
 @pytest.fixture(scope="session")
 def server(request: SubRequest) -> Iterable[str]:
-    """ Yields server name in confing file - generate tests will generate servers based on the server option. """
+    """Yields server name in confing file - generate tests will generate servers based on the server option."""
     yield request.param
 
 
 @pytest.fixture(scope="session")
 def server_properties(request: SubRequest, server: str) -> Iterable[dict]:
-    """ Yields server properties dict for the requested server. """
+    """Yields server properties dict for the requested server."""
     yield get_test_config(request.config.getoption("--tgn-config")).server_properties[server]

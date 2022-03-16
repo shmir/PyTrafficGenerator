@@ -7,11 +7,10 @@ from collections.abc import Iterable
 from enum import Enum
 from os import path
 from types import ModuleType
-from typing import Optional
 
 
 class ApiType(Enum):
-    """ List TGN API types. """
+    """List TGN API types."""
 
     # pylint: disable=invalid-name
     tcl = 1
@@ -21,7 +20,7 @@ class ApiType(Enum):
 
 
 class TgnError(Exception):
-    """ Base exception for traffic generator exceptions. """
+    """Base exception for traffic generator exceptions."""
 
 
 def flatten(ml_list: list) -> list:
@@ -83,7 +82,7 @@ def is_ip(str_value: str) -> bool:
     return is_ipv4(str_value) or is_ipv6(str_value)
 
 
-def new_log_file(logger, suffix: str, file_type: Optional[str] = "tcl") -> logging.Logger:
+def new_log_file(logger: logging.Logger, suffix: str, file_type: str = "tcl") -> logging.Logger:
     """Create new logger and log file from existing logger.
 
     The new logger will be create in the same directory as the existing logger file and will be named as the existing

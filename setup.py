@@ -6,7 +6,7 @@ Package PyTrafficGenerator for distribution.
 from setuptools import find_packages, setup
 
 
-def main():
+def main() -> None:
     """Packaging script."""
     with open("requirements.txt", "r") as requirements:
         install_requires = requirements.read().splitlines()

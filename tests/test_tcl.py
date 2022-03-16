@@ -16,7 +16,7 @@ def logger() -> logging.Logger:
     logger = logging.getLogger("tgn")
     logger.setLevel(logging.DEBUG)
     logger.addHandler(logging.StreamHandler(sys.stdout))
-    yield logger
+    return logger
 
 
 @pytest.fixture
@@ -57,6 +57,6 @@ def test_list(tcl: TgnTclWrapper) -> None:
     assert len(tcl_list_2_py_list(tcl_list)) == 2
 
 
-def test_file_name():
+def test_file_name() -> None:
     """Test Tcl file names normalization."""
     assert tcl_file_name("a\\b/c").strip() == "{a/b/c}"

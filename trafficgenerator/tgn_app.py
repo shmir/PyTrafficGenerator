@@ -7,9 +7,9 @@ from trafficgenerator.tgn_utils import ApiType
 
 
 class TgnApp:
-    """ Base class for all TGN applications classes. """
+    """Base class for all TGN applications classes."""
 
     def __init__(self, logger: logging.Logger, api_wrapper: ApiType) -> None:
-        """ Initialize logger and API wrapper. """
+        """Initialize logger and API wrapper."""
         self.logger = logger
         self.api = api_wrapper
