@@ -23,12 +23,7 @@ def main():
         author_email="yoram@ignissoft.com",
         platforms="any",
         install_requires=install_requires,
-        packages=find_packages(
-            exclude=(
-                "tests",
-                "tests.*",
-            )
-        ),
+        packages=find_packages(include=["trafficgenerator"]),
         include_package_data=True,
         long_description=long_description,
         long_description_content_type="text/markdown",
