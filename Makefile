@@ -17,21 +17,24 @@ help:
 	@echo '        user=user name, default pypiadmin'
 	@echo '        password=user password, default pypiadmin'
 
-install:
-	python -m pip install -U pip
-	pip install -U -r requirements-dev.txt
-
-.PHONY: build
-build:
-	make test
+clean:
 	rm -rf dist/*
 	rm -rf *.egg-info
 	rm -rf build
+
+install:
+	make clean
+	python -m pip install -U pip
+	pip install -U -r requirements-dev.txt
+
+test:
+	pytest --cache-clear --cov=trafficgenerator
+
+build:
+	make test
+	make clean
 	python setup.py bdist_wheel
 
 upload:
 	make build
 	twine upload --repository-url http://$(repo):8036 --user $(user) --password $(password) dist/*
-
-test:
-	pytest --cache-clear --cov=trafficgenerator

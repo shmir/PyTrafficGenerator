@@ -1,8 +1,6 @@
 """
 Base class and utilities for all TGN objects.
 """
-from __future__ import annotations
-
 import gc
 import json
 from abc import ABC, abstractmethod
@@ -24,26 +22,25 @@ def _wa_norm_obj_ref(obj_ref: str) -> str:
 class TgnObjectsDict(OrderedDict):
     """Dictionary to map from TgnObjects to whatever data.
 
-    Dictionary keys must be TgnObject but then it can be accessed by the object itself, the object reference or the
+    Dictionary keys must be TgnObject, but then it can be accessed by the object itself, the object reference or the
     object name.
     """
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key: "TgnObject", value: object) -> None:
         if not isinstance(key, TgnObject):
             raise TgnError(f"tgn_object_dict keys must be TgnObject, not {type(key)}")
-        return OrderedDict.__setitem__(self, key, value)
+        OrderedDict.__setitem__(self, key, value)
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: Union["TgnObject", str]) -> Optional[object]:
         if key in self.keys():
             return OrderedDict.__getitem__(self, key)
-        else:
-            for obj in self:
-                if key in [obj.name, obj.ref]:
-                    return OrderedDict.__getitem__(self, obj)
+        for obj in self:
+            if key in [obj.name, obj.ref]:
+                return OrderedDict.__getitem__(self, obj)
         return None
 
-    def dumps(self, indent=1):
-        """Returns nested string representation of the dictionary (like json.dumps).
+    def dumps(self, indent: int = 1) -> str:
+        """Return nested string representation of the dictionary (like json.dumps).
 
         :TODO: Rewrite with serializer?
 
@@ -67,13 +64,12 @@ class TgnSubStatsDict(TgnObjectsDict):
     In this case dict[key] == dict[rx port][key].
     """
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: Union["TgnObject", str]) -> object:
         if super().__getitem__(key) is not None:
             return super().__getitem__(key)
-        else:
-            if len(self) > 1:
-                raise KeyError("multiple values")
-            return list(self.values())[0][key]
+        if len(self) > 1:
+            raise KeyError("multiple values")
+        return list(self.values())[0][key]
 
 
 class TgnObject(ABC):
@@ -81,7 +77,7 @@ class TgnObject(ABC):
 
     objects = OrderedDict()
 
-    def __init__(self, parent: Union[TgnObject, None], **data: str) -> None:
+    def __init__(self, parent: Union["TgnObject", None], **data: str) -> None:
         """Create new TGN object in the API.
 
         If object does not exist on the chassis, create it on the chassis as well.
@@ -101,51 +97,50 @@ class TgnObject(ABC):
         if "name" not in self._data:
             self._data["name"] = self.ref
         if self._data.get("parent", None):
-            # todo: make sure each object has parent and test only for None parents (STC project and IXN root).
+            # TODO: make sure each object has parent and test only for None parents (STC project and IXN root).
             self._data["parent"].objects[self.ref] = self
 
     def __str__(self) -> str:
         return self.name
 
-    def get_child(self, *types: str) -> Optional[TgnObject]:
-        """Returns the first (and for most useful cases only) child of the requested type(s).
+    def get_child(self, *types: str) -> Optional["TgnObject"]:
+        """Return the first (and for most useful cases only) child of the requested type(s).
 
         :param types: list of requested types.
         """
         children = list(self.get_children(*types))
         return children[0] if children else None
 
-    def get_object_by_ref(self, obj_ref: str) -> TgnObject:
-        """Returns the first object with the requested object reference in the object branch.
+    def get_object_by_ref(self, obj_ref: str) -> "TgnObject":
+        """Return the first object with the requested object reference in the object branch.
 
         :param obj_ref: requested object reference.
         """
         return self.get_object_by_key("objRef", _wa_norm_obj_ref(obj_ref))
 
-    def get_object_by_name(self, obj_name: str) -> TgnObject:
-        """Returns the first object with the requested object name in the object branch.
+    def get_object_by_name(self, obj_name: str) -> "TgnObject":
+        """Return the first object with the requested object name in the object branch.
 
         :param obj_name: requested object name.
         """
         return self.get_object_by_key("name", obj_name)
 
-    def get_object_by_key(self, key: str, value: object) -> Optional[TgnObject]:
-        """Returns the first object with the requested key/value in the object branch.
+    def get_object_by_key(self, key: str, value: object) -> Optional["TgnObject"]:
+        """Return the first object with the requested key/value in the object branch.
 
         :param key: Requested object key.
         :param value: Requested object value.
         """
         if self._data[key] == value:
             return self
-        else:
-            for child in self.objects.values():
-                obj = child.get_object_by_key(key, value)
-                if obj is not None:
-                    return obj
+        for child in self.objects.values():
+            obj = child.get_object_by_key(key, value)
+            if obj is not None:
+                return obj
         return None
 
-    def get_objects_by_type(self, *types) -> List[TgnObject]:
-        """Returned objects stored in memory (without re-reading them from the TGN).
+    def get_objects_by_type(self, *types: str) -> List["TgnObject"]:
+        """Return objects stored in memory (without re-reading them from the TGN).
 
         Use this method for fast access to objects in case of static configurations.
 
@@ -156,7 +151,7 @@ class TgnObject(ABC):
         types_l = [o.lower() for o in types]
         return [o for o in self.objects.values() if o.type.lower() in types_l]
 
-    def get_object_by_type(self, *types: str) -> Optional[TgnObject]:
+    def get_object_by_type(self, *types: str) -> Optional["TgnObject"]:
         """Return the first child object stored in memory (without re-reading them from the TGN).
 
         :param types: requested object types.
@@ -164,8 +159,8 @@ class TgnObject(ABC):
         children = self.get_objects_by_type(*types)
         return children[0] if any(children) else None
 
-    def get_objects_by_type_in_subtree(self, *types: str) -> List[TgnObject]:
-        """Returns all children of the specified types.
+    def get_objects_by_type_in_subtree(self, *types: str) -> List["TgnObject"]:
+        """Return all children of the specified types.
 
         :param types: requested object types.
         """
@@ -174,8 +169,8 @@ class TgnObject(ABC):
             typed_objects += child.get_objects_by_type_in_subtree(*types)
         return typed_objects
 
-    def get_objects_or_children_by_type(self, *types: str) -> List[TgnObject]:
-        """Returns objects if children already been read or get children.
+    def get_objects_or_children_by_type(self, *types: str) -> List["TgnObject"]:
+        """Return objects if children already been read or get children.
 
         Use this method for fast access to objects in case of static configurations.
 
@@ -184,7 +179,7 @@ class TgnObject(ABC):
         objects = self.get_objects_by_type(*types)
         return objects if objects else self.get_children(*types)
 
-    def get_object_or_child_by_type(self, *types: str) -> TgnObject:
+    def get_object_or_child_by_type(self, *types: str) -> "TgnObject":
         """Get object if child already been read or get child.
 
         Use this method for fast access to objects in case of static configurations.
@@ -194,24 +189,24 @@ class TgnObject(ABC):
         objects = self.get_objects_or_children_by_type(*types)
         return objects[0] if any(objects) else None
 
-    def get_objects_with_object(self, obj_type: str, *child_types: str) -> List[TgnObject]:
-        """Returns all children of the requested type that have the requested child types.
+    def get_objects_with_object(self, obj_type: str, *child_types: str) -> List["TgnObject"]:
+        """Return all children of the requested type that have the requested child types.
 
         :param obj_type: requested object type.
         :param child_types: requested child types.
         """
         return [o for o in self.get_objects_by_type(obj_type) if o.get_objects_by_type(*child_types)]
 
-    def get_objects_without_object(self, obj_type: str, *child_types: str) -> List[TgnObject]:
-        """Returns all children of the requested type that do not have the unrequested child types.
+    def get_objects_without_object(self, obj_type: str, *child_types: str) -> List["TgnObject"]:
+        """Return all children of the requested type that do not have the unrequested child types.
 
         :param obj_type: requested object type.
         :param child_types: unrequested child types.
         """
         return [o for o in self.get_objects_by_type(obj_type) if not o.get_objects_by_type(*child_types)]
 
-    def get_objects_with_attribute(self, obj_type: str, attribute: str, value: str) -> List[TgnObject]:
-        """Returns all children of the requested type that have the requested attribute == requested value.
+    def get_objects_with_attribute(self, obj_type: str, attribute: str, value: str) -> List["TgnObject"]:
+        """Return all children of the requested type that have the requested attribute == requested value.
 
         :param obj_type: requested object type.
         :param attribute: requested attribute.
@@ -219,17 +214,16 @@ class TgnObject(ABC):
         """
         return [o for o in self.get_objects_by_type(obj_type) if o.get_attribute(attribute) == value]
 
-    def get_ancestor_object_by_type(self, obj_type: str) -> Optional[TgnObject]:
-        """Returns the ancestor of the object who's type is obj_type if exists else None.
+    def get_ancestor_object_by_type(self, obj_type: str) -> Optional["TgnObject"]:
+        """Return the ancestor of the object whose type is obj_type if exists else None.
 
         :param obj_type: requested ancestor type.
         """
         if self.type.lower() == obj_type.lower():
             return self
-        else:
-            if not self.parent:
-                return None
-            return self.parent.get_ancestor_object_by_type(obj_type)
+        if not self.parent:
+            return None
+        return self.parent.get_ancestor_object_by_type(obj_type)
 
     def del_object_from_parent(self) -> None:
         """Delete object from parent object."""
@@ -244,7 +238,7 @@ class TgnObject(ABC):
         for obj in self.get_objects_by_type(obj_type):
             obj.del_object_from_parent()
 
-    def get_object_from_attribute(self, attribute: str) -> Optional[TgnObject]:
+    def get_object_from_attribute(self, attribute: str) -> Optional["TgnObject"]:
         """Read attribute as reference and return an object for it.
 
         Return object for the reference exists in the objects tree, else create new one under the self object.
@@ -256,8 +250,8 @@ class TgnObject(ABC):
         return objects[0] if objects else None
 
     @classmethod
-    def get_objects_of_class(cls) -> List[TgnObject]:
-        """Returns all instances of the requested class."""
+    def get_objects_of_class(cls) -> List["TgnObject"]:
+        """Return all instances of the requested class."""
         return [o for o in gc.get_objects() if isinstance(o, cls)]
 
     #
@@ -295,7 +289,7 @@ class TgnObject(ABC):
 
     type = property(obj_type)  # noqa: A003
 
-    def obj_parent(self) -> TgnObject:
+    def obj_parent(self) -> "TgnObject":
         """
         :return: object parent.
         """
@@ -330,13 +324,13 @@ class TgnObject(ABC):
     def _set_data(self, **data: str) -> None:
         self._data.update(data)
 
-    def _build_children_objs(self, child_type, children):
+    def _build_children_objs(self, child_type, children) -> Dict[str, "TgnObject"]:
         children_objs = OrderedDict()
         child_obj_type = self.get_obj_class(child_type)
         for child in (c for c in children if c != ""):
             child_object = child_obj_type(parent=self, objRef=child, objType=child_type)
             child_object._set_data(name=child_object.get_name())  # pylint: disable=protected-access
-            children_objs[child_object.obj_ref()] = child_object
+            children_objs[child_object.ref] = child_object
         self.objects.update(children_objs)
         return children_objs
 
@@ -367,14 +361,14 @@ class TgnObject(ABC):
         """
 
     @abstractmethod
-    def get_children(self, *types: str) -> List[TgnObject]:
+    def get_children(self, *types: str) -> List["TgnObject"]:
         """Get all children of the requested types.
 
         :param types: requested children types.
         """
 
     @abstractmethod
-    def get_objects_from_attribute(self, attribute: str) -> List[TgnObject]:
+    def get_objects_from_attribute(self, attribute: str) -> List["TgnObject"]:
         """Read attribute as list of references and return an object for each of them.
 
         For each reference in the attribute, return its object if exists in the objects tree or create new object under
@@ -385,8 +379,8 @@ class TgnObject(ABC):
         """
 
     @abstractmethod
-    def get_obj_class(self, obj_type: str) -> Type[TgnObject]:
-        """Returns the object class based on parent and object type.
+    def get_obj_class(self, obj_type: str) -> Type["TgnObject"]:
+        """Return the object class based on parent and object type.
 
         :param obj_type: requested object type.
         """
@@ -401,4 +395,4 @@ class TgnL3(ABC):
 
     @abstractmethod
     def num_ips(self) -> int:
-        """Returns number of IP addresses."""
+        """Return number of IP addresses."""

@@ -24,18 +24,15 @@ class TgnError(Exception):
 
 
 def flatten(ml_list: list) -> list:
-    """Recursievely flatten lists of lists into single list.
+    """Recursively flatten lists of lists into single list.
 
     :param ml_list: Multi-level list to flatten.
     """
-    if isinstance(ml_list, Iterable):
-        return [a for i in ml_list for a in flatten(i)]
-    else:
-        return [ml_list]
+    return [a for i in ml_list for a in flatten(i)] if isinstance(ml_list, Iterable) else [ml_list]
 
 
 def is_true(str_value: str) -> bool:
-    """Returns True if string represents True value else return False.
+    """Return True if string represents True value else return False.
 
     :param str_value: String to evaluate.
     """
@@ -43,7 +40,7 @@ def is_true(str_value: str) -> bool:
 
 
 def is_false(str_value: str) -> bool:
-    """Returns True if string represents False value else return True.
+    """Return True if string represents False value else return True.
 
     :param str_value: String to evaluate.
     """
@@ -51,7 +48,7 @@ def is_false(str_value: str) -> bool:
 
 
 def is_local_host(location: str) -> bool:
-    """Returns True if ip represents localhost or offline else return False.
+    """Return True if ip represents localhost or offline else return False.
 
     :param location: Location string in the format ip[/slot[/port]].
     """
@@ -59,7 +56,7 @@ def is_local_host(location: str) -> bool:
 
 
 def is_ipv4(str_value: str) -> bool:
-    """Returns True if string represents IPv4 else return False.
+    """Return True if string represents IPv4 else return False.
 
     :param str_value: String to evaluate.
     """
@@ -67,7 +64,7 @@ def is_ipv4(str_value: str) -> bool:
 
 
 def is_ipv6(str_value: str) -> bool:
-    """Returns True if string represents IPv6 else return False.
+    """Return True if string represents IPv6 else return False.
 
     :param str_value: String to evaluate.
     """
@@ -75,7 +72,7 @@ def is_ipv6(str_value: str) -> bool:
 
 
 def is_ip(str_value: str) -> bool:
-    """Returns True if string represents and IP address (either IPv4 or IPv6), else False.
+    """Return True if string represents and IP address (either IPv4 or IPv6), else False.
 
     :param str str_value: String to evaluate.
     """
@@ -106,7 +103,7 @@ def new_log_file(logger: logging.Logger, suffix: str, file_type: str = "tcl") ->
 
 
 def get_test_config(test_config_path: str) -> ModuleType:
-    """Import tests configuration modeule from path.
+    """Import tests configuration module from path.
 
     :param test_config_path: Full path to test configuration module.
     """

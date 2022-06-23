@@ -7,7 +7,7 @@ from setuptools import find_packages, setup
 
 
 def main() -> None:
-    """Packaging script."""
+    """Package script."""
     with open("requirements.txt", "r") as requirements:
         install_requires = requirements.read().splitlines()
     with open("README.md", "r") as readme:

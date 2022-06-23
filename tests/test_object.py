@@ -3,7 +3,7 @@ Tests for basic TGN object operations.
 """
 # pylint: disable=redefined-outer-name
 import logging
-from typing import Dict, Iterable, List, Type
+from typing import Dict, List, Type
 
 import pytest
 
@@ -15,16 +15,18 @@ from trafficgenerator.tgn_utils import ApiType, TgnError, flatten, is_false, is_
 class TgnTestObject(TgnObject):
     """Mock test object."""
 
+    # pylint: disable=too-many-instance-attributes
+
     def get_attributes(self) -> Dict[str, str]:
-        """Returns object data as its attributes."""
+        """Return object data as its attributes."""
         return self._data
 
     def get_attribute(self, attribute: str) -> str:
-        """Returns single data entry as a single attribute."""
+        """Return single data entry as a single attribute."""
         return self._data[attribute]
 
     def get_children(self, *types: str) -> List[TgnObject]:
-        """Returns all objects as children."""
+        """Return all objects as children."""
         return list(self.objects.values())
 
     def _create(self, **attributes: object) -> str:
@@ -41,8 +43,8 @@ class TgnTestObject(TgnObject):
 
 
 @pytest.fixture()
-def tgn_object() -> Iterable[TgnTestObject]:
-    """Yields dummy objects hierarchy."""
+def tgn_object() -> TgnTestObject:
+    """Yield dummy objects hierarchy."""
     # pylint: disable=attribute-defined-outside-init
     tgn_object = TgnTestObject(parent=None, objRef="root1", objType="root")
     tgn_object.api = None
@@ -53,7 +55,7 @@ def tgn_object() -> Iterable[TgnTestObject]:
     tgn_object.node1.node11 = TgnTestObject(objRef="node11", objType="node", parent=tgn_object.node1, name="name11")
     tgn_object.node1.node12 = TgnTestObject(objRef="node12", objType="node", parent=tgn_object.node1, name="name12")
     tgn_object.node1.leaf11 = TgnTestObject(objRef="leaf11", objType="leaf", parent=tgn_object.node1)
-    yield tgn_object
+    return tgn_object
 
 
 def test_app() -> None:
@@ -101,7 +103,7 @@ def test_objects_dict(tgn_object: TgnTestObject) -> None:
     objects_dict[tgn_object.node1][tgn_object.node1.node12] = "node 12 entry"
     objects_dict[tgn_object.node1][tgn_object.node1.leaf11] = TgnObjectsDict()
     objects_dict[tgn_object.node2] = "node 2 entry"
-    with pytest.raises(TgnError) as _:
+    with pytest.raises(TgnError):
         objects_dict["invalid key"] = ""
     assert objects_dict[tgn_object.node2] == "node 2 entry"
     assert objects_dict[tgn_object.node2.name] == "node 2 entry"
@@ -119,7 +121,7 @@ def test_sub_dict(tgn_object: TgnTestObject) -> None:
     assert sub_stats_dict[tgn_object.node1]["a"] == 1
     assert sub_stats_dict[tgn_object.node2]["c"] == 3
     with pytest.raises(KeyError):
-        sub_stats_dict["a"]
+        sub_stats_dict["a"]  # pylint: disable=pointless-statement
 
 
 def test_true_false() -> None:
