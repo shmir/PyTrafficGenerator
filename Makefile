@@ -3,6 +3,8 @@
 # To upload to pypi.org use plain twine upload.
 #
 
+.PHONY: clean build
+
 repo=localhost
 user=pypiadmin
 password=pypiadmin
@@ -17,21 +19,24 @@ help:
 	@echo '        user=user name, default pypiadmin'
 	@echo '        password=user password, default pypiadmin'
 
-install:
-	python -m pip install -U pip
-	pip install -U -r requirements-dev.txt
-
-.PHONY: build
-build:
-	make test
+clean:
 	rm -rf dist/*
 	rm -rf *.egg-info
 	rm -rf build
-	python setup.py bdist_wheel
+
+install:
+	make clean
+	python -m pip install -U pip
+	pip install -U -r requirements.txt
+
+test:
+	pytest --cache-clear --cov=trafficgenerator
+
+build:
+	make clean
+	make test
+	python -m build . --wheel
 
 upload:
 	make build
 	twine upload --repository-url http://$(repo):8036 --user $(user) --password $(password) dist/*
-
-test:
-	pytest --cache-clear --cov=trafficgenerator

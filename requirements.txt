@@ -1,1 +1,21 @@
-future
+fabric
+paramiko
+vmwc
+
+# Testing
+pytest
+pytest-cov
+tox
+
+# Pipeline
+pre-commit
+pylint
+pylint_pytest
+
+# Packaging
+setuptools-scm
+build
+
+# Documentation
+mkdocs
+mkdocs-material
