@@ -3,28 +3,30 @@ Tests for basic TGN object operations.
 """
 # pylint: disable=redefined-outer-name
 import logging
+import typing
 from typing import Dict, Iterable, List, Type
 
 import pytest
 
+from trafficgenerator import ApiType, TgnError
 from trafficgenerator.tgn_app import TgnApp
 from trafficgenerator.tgn_object import TgnObject, TgnObjectsDict, TgnSubStatsDict
-from trafficgenerator.tgn_utils import ApiType, TgnError, flatten, is_false, is_ip, is_local_host, is_true
+from trafficgenerator.tgn_utils import flatten, is_false, is_ip, is_local_host, is_true
 
 
 class TgnTestObject(TgnObject):
     """Mock test object."""
 
     def get_attributes(self) -> Dict[str, str]:
-        """Returns object data as its attributes."""
+        """Return object data as its attributes."""
         return self._data
 
     def get_attribute(self, attribute: str) -> str:
-        """Returns single data entry as a single attribute."""
+        """Return single data entry as a single attribute."""
         return self._data[attribute]
 
     def get_children(self, *types: str) -> List[TgnObject]:
-        """Returns all objects as children."""
+        """Return all objects as children."""
         return list(self.objects.values())
 
     def _create(self, **attributes: object) -> str:
@@ -40,9 +42,10 @@ class TgnTestObject(TgnObject):
         """todo: add implementation and test."""
 
 
-@pytest.fixture()
+@typing.no_type_check
+@pytest.fixture
 def tgn_object() -> Iterable[TgnTestObject]:
-    """Yields dummy objects hierarchy."""
+    """Yield dummy objects hierarchy."""
     # pylint: disable=attribute-defined-outside-init
     tgn_object = TgnTestObject(parent=None, objRef="root1", objType="root")
     tgn_object.api = None
@@ -63,6 +66,7 @@ def test_app() -> None:
     assert tgn_app.api == ApiType.tcl
 
 
+@typing.no_type_check
 def test_objects_tree(tgn_object: TgnTestObject) -> None:
     """Test object search operations."""
     assert tgn_object.ref == "root1"
@@ -93,6 +97,7 @@ def test_objects_tree(tgn_object: TgnTestObject) -> None:
     assert tgn_object.get_child() == tgn_object.leaf1
 
 
+@typing.no_type_check
 def test_objects_dict(tgn_object: TgnTestObject) -> None:
     """Test TgnObjectsDict class."""
     objects_dict = TgnObjectsDict()
@@ -106,20 +111,34 @@ def test_objects_dict(tgn_object: TgnTestObject) -> None:
     assert objects_dict[tgn_object.node2] == "node 2 entry"
     assert objects_dict[tgn_object.node2.name] == "node 2 entry"
     assert objects_dict[tgn_object.node2.ref] == "node 2 entry"
+    assert objects_dict.get(tgn_object.node2.ref) == "node 2 entry"
+    assert objects_dict.get(tgn_object.node2.name) == "node 2 entry"
+    assert objects_dict.get(tgn_object.node2.ref) == "node 2 entry"
+    assert not objects_dict.get("invalid key")
+    assert objects_dict.get("invalid key", "value") == "value"
+    with pytest.raises(KeyError):
+        objects_dict["invalid key"]  # pylint: disable=pointless-statement
 
 
+@typing.no_type_check
 def test_sub_dict(tgn_object: TgnTestObject) -> None:
     """Test TgnSubStatsDict class."""
     sub_stats_dict = TgnSubStatsDict()
     sub_stats_dict[tgn_object.node1] = {"a": 1, "b": 2}
     assert sub_stats_dict[tgn_object.node1]["a"] == 1
+    assert sub_stats_dict.get(tgn_object.node1)["a"] == 1
     assert sub_stats_dict[tgn_object.node1.name]["a"] == 1
+    assert sub_stats_dict.get(tgn_object.node1.name)["a"] == 1
     assert sub_stats_dict["a"] == 1
+    assert sub_stats_dict.get("a") == 1
     sub_stats_dict[tgn_object.node2] = {"c": 3, "d": 4}
     assert sub_stats_dict[tgn_object.node1]["a"] == 1
+    assert sub_stats_dict.get(tgn_object.node1)["a"] == 1
     assert sub_stats_dict[tgn_object.node2]["c"] == 3
+    assert sub_stats_dict.get(tgn_object.node2)["c"] == 3
     with pytest.raises(KeyError):
-        sub_stats_dict["a"]
+        sub_stats_dict["a"]  # pylint: disable=pointless-statement
+    assert not sub_stats_dict.get("a")
 
 
 def test_true_false() -> None:

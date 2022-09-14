@@ -4,23 +4,8 @@ TGN projects utilities and errors.
 import importlib.util
 import logging
 from collections.abc import Iterable
-from enum import Enum
 from os import path
 from types import ModuleType
-
-
-class ApiType(Enum):
-    """List TGN API types."""
-
-    # pylint: disable=invalid-name
-    tcl = 1
-    python = 2
-    rest = 3
-    socket = 4
-
-
-class TgnError(Exception):
-    """Base exception for traffic generator exceptions."""
 
 
 def flatten(ml_list: list) -> list:
@@ -30,12 +15,11 @@ def flatten(ml_list: list) -> list:
     """
     if isinstance(ml_list, Iterable):
         return [a for i in ml_list for a in flatten(i)]
-    else:
-        return [ml_list]
+    return [ml_list]
 
 
 def is_true(str_value: str) -> bool:
-    """Returns True if string represents True value else return False.
+    """Return True if string represents True value else return False.
 
     :param str_value: String to evaluate.
     """
@@ -43,7 +27,7 @@ def is_true(str_value: str) -> bool:
 
 
 def is_false(str_value: str) -> bool:
-    """Returns True if string represents False value else return True.
+    """Return True if string represents False value else return True.
 
     :param str_value: String to evaluate.
     """
@@ -51,7 +35,7 @@ def is_false(str_value: str) -> bool:
 
 
 def is_local_host(location: str) -> bool:
-    """Returns True if ip represents localhost or offline else return False.
+    """Return True if ip represents localhost or offline else return False.
 
     :param location: Location string in the format ip[/slot[/port]].
     """
@@ -59,7 +43,7 @@ def is_local_host(location: str) -> bool:
 
 
 def is_ipv4(str_value: str) -> bool:
-    """Returns True if string represents IPv4 else return False.
+    """Return True if string represents IPv4 else return False.
 
     :param str_value: String to evaluate.
     """
@@ -67,7 +51,7 @@ def is_ipv4(str_value: str) -> bool:
 
 
 def is_ipv6(str_value: str) -> bool:
-    """Returns True if string represents IPv6 else return False.
+    """Return True if string represents IPv6 else return False.
 
     :param str_value: String to evaluate.
     """
@@ -75,7 +59,7 @@ def is_ipv6(str_value: str) -> bool:
 
 
 def is_ip(str_value: str) -> bool:
-    """Returns True if string represents and IP address (either IPv4 or IPv6), else False.
+    """Return True if string represents and IP address (either IPv4 or IPv6), else False.
 
     :param str str_value: String to evaluate.
     """

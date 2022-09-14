@@ -5,14 +5,14 @@ Shared utilities for pytest conftest.
 import logging
 import sys
 from pathlib import Path
-from typing import Iterable
 
 import pytest
 from _pytest.config.argparsing import Parser
 from _pytest.fixtures import SubRequest
 from _pytest.python import Metafunc
 
-from trafficgenerator.tgn_utils import ApiType, get_test_config
+from trafficgenerator import ApiType
+from trafficgenerator.tgn_utils import get_test_config
 
 
 def tgn_pytest_addoption(parser: Parser, tgn_config: str) -> None:
@@ -46,26 +46,26 @@ def pytest_generate_tests(metafunc: Metafunc) -> None:
 
 @pytest.fixture(scope="session")
 def logger() -> logging.Logger:
-    """Yields configured logger."""
+    """Yield configured logger."""
     logger = logging.getLogger("tgn")
     logger.setLevel(logging.DEBUG)
     logger.addHandler(logging.StreamHandler(sys.stdout))
-    yield logger
+    return logger
 
 
 @pytest.fixture(scope="session")
-def api(request: SubRequest) -> Iterable[ApiType]:
+def api(request: SubRequest) -> ApiType:
     """Yield API type - generate tests will generate API types based on the api option."""
-    yield ApiType[request.param]
+    return ApiType[request.param]
 
 
 @pytest.fixture(scope="session")
-def server(request: SubRequest) -> Iterable[str]:
-    """Yields server name in confing file - generate tests will generate servers based on the server option."""
-    yield request.param
+def server(request: SubRequest) -> str:
+    """Yield server name in confing file - generate tests will generate servers based on the server option."""
+    return request.param
 
 
 @pytest.fixture(scope="session")
-def server_properties(request: SubRequest, server: str) -> Iterable[dict]:
-    """Yields server properties dict for the requested server."""
-    yield get_test_config(request.config.getoption("--tgn-config")).server_properties[server]
+def server_properties(request: SubRequest, server: str) -> dict:
+    """Yield server properties dict for the requested server."""
+    return get_test_config(request.config.getoption("--tgn-config")).server_properties[server]

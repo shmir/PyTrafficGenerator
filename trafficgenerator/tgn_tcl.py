@@ -9,21 +9,21 @@ from typing import Dict, List, Optional
 from trafficgenerator.tgn_object import TgnObject
 from trafficgenerator.tgn_utils import new_log_file
 
-# Tcl is must only if the test chooses to use Tcl API so it is OK if Tcl is not installed (e.g for some Linux
+# Tcl is must only if the test chooses to use Tcl API, so it is OK if Tcl is not installed (e.g for some Linux
 # installations). If Tcl interpreter is required and not installed it will fail anyway...
 try:
     from tkinter import Tcl
 
     from _tkinter import TclError
 
-    tcl_interp_g: Optional[Tcl] = None
+    tcl_interp_g: "TgnTk" = None
     """ Global Tcl interpreter for Tcl based utilities. Does not log its operations. """
 except ModuleNotFoundError:
     pass
 
 
 def tcl_str(string: str = "") -> str:
-    """Returns Tcl string surrounded by {}.
+    """Return Tcl string surrounded by {}.
 
     :param string: Python string.
     """
@@ -31,7 +31,7 @@ def tcl_str(string: str = "") -> str:
 
 
 def tcl_file_name(name: str) -> str:
-    """Returns normalized file name with forward slashes.
+    """Return normalized file name with forward slashes.
 
     :param name: file name.
     """
@@ -39,7 +39,7 @@ def tcl_file_name(name: str) -> str:
 
 
 def get_args_pairs(arguments: Dict[str, object]) -> str:
-    """Returns Tcl list of argument pairs <-key, value> to be used in TGN API commands.
+    """Return Tcl list of argument pairs <-key, value> to be used in TGN API commands.
 
     :param arguments: Python dictionary of TGN API command arguments <key, value>.
     """
@@ -47,7 +47,7 @@ def get_args_pairs(arguments: Dict[str, object]) -> str:
 
 
 def build_obj_ref_list(objects: List[TgnObject]) -> str:
-    """Returns Tcl list of all requested objects references.
+    """Return Tcl list of all requested objects references.
 
     :param objects: Python list of requested objects.
     """
@@ -87,6 +87,7 @@ class TgnTk:
     """Native Python Tk interpreter."""
 
     def __init__(self) -> None:
+        """Init Tcl interpreter."""
         self.tcl = Tcl()
 
     def eval(self, command: str) -> str:  # noqa: A003
@@ -98,7 +99,7 @@ class TgnTclWrapper:
     """Tcl connectivity for TGN projects."""
 
     def __init__(self, logger: logging.Logger, tcl_interp: Optional[TgnTk] = None) -> None:
-        """Init Python Tk package.
+        """Init Python Tcl package.
 
         Add logger to log Tcl commands only.
         This creates a clean Tcl script that can be used later for debug.
@@ -116,7 +117,7 @@ class TgnTclWrapper:
             self.tcl_interp = tcl_interp
         global tcl_interp_g  # pylint: disable=invalid-name, global-statement
         tcl_interp_g = self.tcl_interp
-        self.rc = None
+        self.rc: str = None
 
     def eval(self, command: str) -> str:  # noqa: A003
         """Execute Tcl command.

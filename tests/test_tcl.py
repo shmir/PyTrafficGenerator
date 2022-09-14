@@ -12,7 +12,7 @@ from trafficgenerator.tgn_tcl import TgnTclWrapper, py_list_to_tcl_list, tcl_fil
 
 @pytest.fixture(scope="session")
 def logger() -> logging.Logger:
-    """Yields logger for package regression testing."""
+    """Yield logger for package regression testing."""
     logger = logging.getLogger("tgn")
     logger.setLevel(logging.DEBUG)
     logger.addHandler(logging.StreamHandler(sys.stdout))
@@ -21,7 +21,7 @@ def logger() -> logging.Logger:
 
 @pytest.fixture
 def tcl(logger: logging.Logger) -> TgnTclWrapper:
-    """Yields TgnTclWrapper."""
+    """Yield TgnTclWrapper."""
     return TgnTclWrapper(logger)
 
 
