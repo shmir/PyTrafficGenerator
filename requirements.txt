@@ -15,6 +15,7 @@ pylint_pytest
 # Packaging
 setuptools-scm
 build
+twine
 
 # Documentation
 mkdocs
