@@ -1,11 +1,9 @@
 """
 TGN projects utilities and errors.
 """
-import importlib.util
 import logging
 from collections.abc import Iterable
 from os import path
-from types import ModuleType
 
 
 def flatten(ml_list: list) -> list:
@@ -87,14 +85,3 @@ def new_log_file(logger: logging.Logger, suffix: str, file_type: str = "tcl") ->
         new_logger.addHandler(logging.FileHandler(tcl_logger_file_name, "w"))
         new_logger.setLevel(logger.getEffectiveLevel())
     return new_logger
-
-
-def get_test_config(test_config_path: str) -> ModuleType:
-    """Import tests configuration modeule from path.
-
-    :param test_config_path: Full path to test configuration module.
-    """
-    spec = importlib.util.spec_from_file_location("test_config", test_config_path)
-    test_config = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(test_config)
-    return test_config

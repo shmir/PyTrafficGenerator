@@ -34,4 +34,4 @@ jobs:
         fi
     - name: Test with pytest
       run: |
-        make test
+        pytest -m "not vmware"

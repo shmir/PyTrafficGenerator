@@ -1,0 +1,11 @@
+# Sample SUT for trafficgenerator testing.
+server:
+  name: Server name in VMWare - Optional.
+  ip: Server IP.
+  user: User with root privileges.
+  password: Password.
+# Optional.
+vmware:
+  ip: VMWare/ESXi IP address.
+  user: User.
+  password: Password

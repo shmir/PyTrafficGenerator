@@ -25,7 +25,7 @@ repos:
         language_version: python3.9
         args: [
           --max-line-length=127,
-          '--ignore=D105,D200'
+          '--ignore=D105,D200,W503,F401,F811'
         ]
   - repo: local
     hooks:
@@ -39,7 +39,7 @@ repos:
           --max-public-methods=32,
           --max-args=8,
           '--disable=logging-fstring-interpolation,logging-not-lazy,unspecified-encoding,too-few-public-methods,too-many-instance-attributes',
-          '--good-names=ip,rc,eval',
+          '--good-names=ip,rc,eval,vm,ls',
           '--load-plugins=pylint_pytest'
         ]
   - repo: https://github.com/pre-commit/mirrors-mypy
@@ -48,3 +48,4 @@ repos:
     -   id: mypy
         verbose: true
         entry: bash -c 'mypy "$@" || true' --
+        additional_dependencies: [types-PyYAML, types-paramiko]

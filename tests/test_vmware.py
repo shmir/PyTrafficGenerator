@@ -2,47 +2,47 @@
 Test VMWare operations.
 """
 # pylint: disable=redefined-outer-name
-from typing import Iterable, Optional
+from typing import Iterable
 
 import pytest
 from vmwc import VMWareClient
 
-from trafficgenerator.server import Server
-from trafficgenerator.vmware import TgnVMWareClientException, VMWare
+from tests.test_server import TgnTestSutUtils
+from trafficgenerator.tgn_server import Server
+from trafficgenerator.tgn_vmware import TgnVMWareClientException, VMWare
+
+pytestmark = pytest.mark.vmware
 
 
 @pytest.fixture
-def machine(sut_utils: SutUtils) -> Iterable[Server]:
+def machine(sut_utils: TgnTestSutUtils, vmware: TgnTestSutUtils) -> Iterable[Server]:
     """Yield Server object for testing."""
-    client_dict = sut_utils.client_dict("linkedin")
-    name, ip = list(client_dict["master"].values())
-    user, password = sut_utils.client_ssh_info("linkedin")
-    server = Server(name, ip, user, password, vmware=sut_utils.vmware("linkedin"))
-    server.power_on()
-    yield server
-    server.power_on()
+    machine = sut_utils.server()
+    machine.power_on()
+    yield machine
+    sut_utils.server().power_on()
 
 
-@pytest.fixture
-def vmware(machine: Server, sut_utils: SutUtils) -> Optional[VMWare]:
-    """Yield VMWare object for testing."""
-    return sut_utils.vmware("linkedin")
-
-
+# pylint: disable=protected-access
 def test_power(vmware: VMWare, machine: Server) -> None:
     """Test power on and off operations."""
-    assert machine.host in vmware.ips_to_vm.keys()
-    assert machine.name in vmware.ips_to_vm.values()
+    with VMWareClient(vmware.host, vmware.username, vmware.password) as client:
+        vmware._get_vm_by_name(client, machine.name)
+        vmware._get_vm_by_ip(client, machine.host)
     vmware.power_off(machine.host)
-    vmware.power_on(machine.name, wait_ip=False)
-    vmware.map_vms()
-    assert machine.host not in vmware.ips_to_vm.keys()
+    with VMWareClient(vmware.host, vmware.username, vmware.password) as client:
+        vmware._get_vm_by_name(client, machine.name)
+        with pytest.raises(TgnVMWareClientException):
+            vmware._get_vm_by_ip(client, machine.host)
+    vmware.power_on(machine.name, wait_vmware_tools=False)
+    with VMWareClient(vmware.host, vmware.username, vmware.password) as client:
+        with pytest.raises(TgnVMWareClientException):
+            vmware._get_vm_by_ip(client, machine.host)
 
 
 # pylint: disable=protected-access
 def test_negative(vmware: VMWare, machine: Server) -> None:
     """Negative tests."""
-    assert "invalid host" not in vmware.ips_to_vm
     with pytest.raises(TgnVMWareClientException):
         vmware.power_on("invalid host")
     with VMWareClient(vmware.host, vmware.username, vmware.password) as client:
@@ -56,4 +56,4 @@ def test_negative(vmware: VMWare, machine: Server) -> None:
             vmware._wait_on(vm, timeout=0)
         vmware._wait_on(vm)
         with pytest.raises(TgnVMWareClientException):
-            vmware._wait_ip(vm, timeout=0)
+            vmware._wait_vmware_tools(vm, timeout=0)

@@ -8,27 +8,20 @@ from typing import Iterable
 import pytest
 from invoke.exceptions import UnexpectedExit
 
-from trafficgenerator.server import Server
-from trafficgenerator.vmware import VMWare
+from tests import TgnTestSutUtils
+from trafficgenerator.tgn_server import Server
+
+pytestmark = pytest.mark.vmware
 
 
 @pytest.fixture
-def vmware(machine: Server, sut_utils: SutUtils) -> Optional[VMWare]:
-    """Yield VMWare object for testing."""
-    return VMWare("")
-
-
-@pytest.fixture
-def server() -> Iterable[Server]:
+def server(sut_utils: TgnTestSutUtils, vmware: TgnTestSutUtils) -> Iterable[Server]:
     """Yield Server object for testing."""
-    client_dict = sut_utils.client_dict("linkedin")
-    user, password = sut_utils.client_ssh_info("linkedin")
-    client_dict = client_dict["master"]
-    server = Server(client_dict["name"], client_dict["ip"], user, password, vmware=sut_utils.vmware("linkedin"))
+    server = sut_utils.server()
     server.power_on()
     yield server
     # Some tests (like negative) change the server object, so re-build it and power on the server.
-    Server(client_dict["name"], client_dict["ip"], user, password, vmware=sut_utils.vmware("linkedin")).power_on()
+    sut_utils.server().power_on()
 
 
 def test_exec_cmd(server: Server) -> None:
@@ -51,7 +44,7 @@ def test_put(server: Server) -> None:
 def test_reboot(server: Server) -> None:
     """Test reboot."""
     assert server.is_up()
-    server.reboot()
+    server.reboot(timeout=120)
     assert server.is_up()
 
 
@@ -79,7 +72,7 @@ def test_negative(server: Server) -> None:
     with pytest.raises(TimeoutError):
         server.wait_reboot(timeout=2)
     server.vmware = None
-    with pytest.raises(KioxiaException):
+    with pytest.raises(ValueError):
         server.shutdown()
-    with pytest.raises(KioxiaException):
+    with pytest.raises(ValueError):
         server.power_on()

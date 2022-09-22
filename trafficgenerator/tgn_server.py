@@ -13,12 +13,13 @@ from typing import Optional, Union
 import fabric.runners
 from fabric import Connection
 from invoke import ThreadException, UnexpectedExit
-from paramiko.ssh_exception import NoValidConnectionsError
-from vmware import VMWare
+from paramiko.ssh_exception import NoValidConnectionsError, SSHException
+
+from trafficgenerator.tgn_vmware import VMWare
 
 logging.getLogger("paramiko").setLevel(logging.WARNING)
 logging.getLogger("invoke").setLevel(logging.WARNING)
-logger = logging.getLogger("trafficgenerator")
+logger = logging.getLogger("tgn.trafficgenerator")
 
 
 class SshShell:
@@ -134,7 +135,7 @@ class Server:
 
         :param timeout: wait for time in seconds
         """
-        logger.info(f"Waiting for {timeout} seconds for host {self} to go DOWN")
+        logger.info(f"Waiting for host {self} to go DOWN")
         for _ in range(timeout):
             if not self.is_up():
                 logger.info(f"{self} is DOWN")
@@ -149,7 +150,7 @@ class Server:
 
         :param timeout: wait for time in seconds
         """
-        logger.info(f"Waiting for {timeout} seconds for host {self} to go UP")
+        logger.info(f"Waiting for host {self} to go UP")
         for _ in range(timeout):
             if self.is_up():
                 logger.info(f"{self} is UP")
@@ -181,9 +182,9 @@ class Server:
                 ) as connection:
                     up_time = connection.run("uptime -p", hide=True).stdout.strip()
                 # In some distros (like centos 7) if uptime < 1 the output will be "up", in others "up 0 minutes".
-                if up_time == "up" or int(up_time.split()[1]) == 0:
+                if up_time == "up" or float(up_time.split()[1]) < timeout / 60:
                     return
-            except (NoValidConnectionsError, socket.timeout):
+            except (NoValidConnectionsError, socket.timeout, SSHException):
                 pass
             time.sleep(1)
         raise TimeoutError(f"{self.host} did not reboot after {timeout} seconds")

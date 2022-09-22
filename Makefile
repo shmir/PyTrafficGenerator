@@ -11,7 +11,6 @@ password=pypiadmin
 
 help:
 	@echo 'install: install pip requirements'
-	@echo 'test: test the package'
 	@echo 'build: build the package'
 	@echo 'upload: create and upload the package to local pypi index'
 	@echo '        takes the following params:'
@@ -29,12 +28,8 @@ install:
 	python -m pip install -U pip
 	pip install -U -r requirements.txt
 
-test:
-	pytest --cache-clear --cov=trafficgenerator
-
 build:
 	make clean
-	make test
 	python -m build . --wheel
 
 upload:
