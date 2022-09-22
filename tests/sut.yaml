@@ -1,0 +1,11 @@
+client:
+  master:
+    name: yoram-linkedin-initiator
+    ip: 172.28.10.30
+  ssh:
+    user: root
+    password: Sanrad2011
+vmware:
+  ip: 172.28.30.105
+  user: yoram@lab.il
+  password: Kioxia!

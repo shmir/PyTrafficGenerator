@@ -1,0 +1,85 @@
+"""
+Test server module.
+"""
+# pylint: disable=redefined-outer-name
+from pathlib import Path
+from typing import Iterable
+
+import pytest
+from invoke.exceptions import UnexpectedExit
+
+from trafficgenerator.server import Server
+from trafficgenerator.vmware import VMWare
+
+
+@pytest.fixture
+def vmware(machine: Server, sut_utils: SutUtils) -> Optional[VMWare]:
+    """Yield VMWare object for testing."""
+    return VMWare("")
+
+
+@pytest.fixture
+def server() -> Iterable[Server]:
+    """Yield Server object for testing."""
+    client_dict = sut_utils.client_dict("linkedin")
+    user, password = sut_utils.client_ssh_info("linkedin")
+    client_dict = client_dict["master"]
+    server = Server(client_dict["name"], client_dict["ip"], user, password, vmware=sut_utils.vmware("linkedin"))
+    server.power_on()
+    yield server
+    # Some tests (like negative) change the server object, so re-build it and power on the server.
+    Server(client_dict["name"], client_dict["ip"], user, password, vmware=sut_utils.vmware("linkedin")).power_on()
+
+
+def test_exec_cmd(server: Server) -> None:
+    """Test commands that fail."""
+    out = server.exec_cmd("pwd")
+    assert out.stdout
+    assert not out.stderr
+    with pytest.raises(UnexpectedExit):
+        server.exec_cmd("invalid_command")
+
+
+def test_put(server: Server) -> None:
+    """Test Server put."""
+    local_path = Path(__file__)
+    server.put(local_path, Path("/tmp"))
+    ls = server.exec_cmd("ls /tmp")
+    assert local_path.name in ls.stdout
+
+
+def test_reboot(server: Server) -> None:
+    """Test reboot."""
+    assert server.is_up()
+    server.reboot()
+    assert server.is_up()
+
+
+def test_power(server: Server) -> None:
+    """Test VM power operations."""
+    assert server.is_up()
+    server.shutdown()
+    assert not server.is_up()
+    server.power_on()
+    assert server.is_up()
+    server.shutdown()
+    server.reboot()
+    assert server.is_up()
+
+
+def test_negative(server: Server) -> None:
+    """Negative tests."""
+    with pytest.raises(UnexpectedExit):
+        server.exec_cmd("false")
+    with pytest.raises(TimeoutError):
+        server.wait2down(timeout=2)
+    server.shutdown()
+    with pytest.raises(TimeoutError):
+        server.wait2up(timeout=2)
+    with pytest.raises(TimeoutError):
+        server.wait_reboot(timeout=2)
+    server.vmware = None
+    with pytest.raises(KioxiaException):
+        server.shutdown()
+    with pytest.raises(KioxiaException):
+        server.power_on()
