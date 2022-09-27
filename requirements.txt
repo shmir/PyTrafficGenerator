@@ -1,6 +1,7 @@
 fabric
 paramiko
 vmwc
+PyYAML
 
 # Testing
 pytest

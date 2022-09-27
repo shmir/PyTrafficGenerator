@@ -8,8 +8,7 @@ from typing import Dict, Iterable, List, Type
 
 import pytest
 
-from trafficgenerator import ApiType, TgnError
-from trafficgenerator.tgn_app import TgnApp
+from trafficgenerator import ApiType, TgnApp, TgnError
 from trafficgenerator.tgn_object import TgnObject, TgnObjectsDict, TgnSubStatsDict
 from trafficgenerator.tgn_utils import flatten, is_false, is_ip, is_local_host, is_true
 
