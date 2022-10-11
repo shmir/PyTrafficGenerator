@@ -1,6 +1,5 @@
-[![Python 3.7|3.8|3.9](https://img.shields.io/badge/python-3.7%7C3.8%7C.3.9-blue.svg)](https://www.python.org/downloads/release/downloads/)
+[![Python 3.7|3.8|3.9|3.10](https://img.shields.io/badge/python-3.7%7C3.8%7C.3.9%7C.3.10-blue.svg)](https://www.python.org/downloads/release/downloads/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-![Build status](https://github.com/shmir/PyTrafficGenerator/actions/workflows/python-package.yml/badge.svg?branch=dev)
 
 Base Python OO API for traffic generators (Ixia, Spirent, Xena, TRex etc.).
 
@@ -37,4 +36,4 @@ http://pytrafficgenerator.readthedocs.io/en/latest/
 
 Contact
 -------
-Feel free to contact me with any question or feature request at yoram@ignissoft.com
+Feel free to contact me with any question or feature request at [yoram@ignissoft.com](mailto:yoram@ignissoft.com).
