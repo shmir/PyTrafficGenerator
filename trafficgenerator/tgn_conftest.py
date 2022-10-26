@@ -8,7 +8,6 @@ import pytest
 import yaml
 from _pytest.config.argparsing import Parser
 from _pytest.fixtures import SubRequest
-from _pytest.python import Metafunc
 
 from trafficgenerator import ApiType
 
@@ -16,7 +15,7 @@ from trafficgenerator import ApiType
 def pytest_addoption(parser: Parser) -> None:
     """Aad tgn parameters to pytest CLI."""
     parser.addoption("--tgn-sut", help="Path to sut file.")
-    parser.addoption("--tgn-api", action="append", default="rest", help="api options: rest or tcl, where applicable")
+    parser.addoption("--tgn-api", choices=["rest", "tcl"], default="rest", help="api options: rest or tcl, where applicable")
     parser.addoption(
         "--tgn-log-level",
         type=int,
@@ -26,16 +25,10 @@ def pytest_addoption(parser: Parser) -> None:
     )
 
 
-def pytest_generate_tests(metafunc: Metafunc) -> None:
-    """Generate tests for each API from pytest options."""
-    if "api" in metafunc.fixturenames:
-        metafunc.parametrize("api", list(set(metafunc.config.getoption("--tgn-api"))), indirect=True)
-
-
 @pytest.fixture(scope="session")
 def api(request: SubRequest) -> ApiType:
     """Yield API type - generate tests will generate API types based on the api option."""
-    return ApiType[request.param]
+    return ApiType[request.config.getoption("--tgn-api")]
 
 
 @pytest.fixture(scope="session")

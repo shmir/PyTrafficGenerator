@@ -129,13 +129,11 @@ class TgnTclWrapper:
         :param command: Command to execute.
         :returns: command raw output.
         """
-        if self.logger.handlers:
-            self.logger.debug(command)
+        self.logger.debug(command)
         if self.tcl_script:
             self.tcl_script.info(command)
         self.rc = self.tcl_interp.eval(command)
-        if self.logger.handlers:
-            self.logger.debug(f"\t{self.rc}")
+        self.logger.debug(f"\t{self.rc}")
         return self.rc
 
     def source(self, script_file: str) -> None:
