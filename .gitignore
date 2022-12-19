@@ -104,3 +104,5 @@ syntax: regexp
 .README.md.html
 
 docs/site
+
+.vscode

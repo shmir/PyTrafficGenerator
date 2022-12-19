@@ -8,4 +8,4 @@ server:
 vmware:
   ip: VMWare/ESXi IP address.
   user: User.
-  password: Password
+  password: Password.

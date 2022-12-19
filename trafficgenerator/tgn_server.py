@@ -51,10 +51,24 @@ class SshShell:
         return result
 
     def put(self, local: Union[str, StringIO], remote: str) -> None:
-        """Put a local file to the remote filesystem."""
+        """Put a local file to the remote filesystem.
+
+        :param local: Local file name.
+        :param remote: Remote file name.
+        """
         logger.info(f"Putting {local} to {remote}")
         with Connection(self.host, user=self.user, connect_kwargs={"password": self.password}) as connection:
             connection.put(local, remote)
+
+    def get(self, remote: str, local: str) -> None:
+        """Get a remote file to the local filesystem.
+
+        :param remote: Remote file name.
+        :param local: Local file name.
+        """
+        logger.info(f"Getting {remote} to {local}")
+        with Connection(self.host, user=self.user, connect_kwargs={"password": self.password}) as connection:
+            connection.get(remote, local)
 
 
 class Server:
@@ -63,8 +77,8 @@ class Server:
     def __init__(self, name: str, host: str, user: str, password: str, vmware: Optional[VMWare] = None) -> None:
         """Initialize SSH and VMWare objects.
 
-        :param name: server name - if server is VM this should be the VM name, otherwise it can be any representative name.
-        :param host: hostname or ipaddress.
+        :param name: Server name - if server is VM this should be the VM name, otherwise it can be any representative name.
+        :param host: Hostname or ipaddress.
         :param user: username.
         :param password: password for user.
         :param vmware: VMWare client in case the server is deployed on VMWare, else None.
@@ -83,32 +97,36 @@ class Server:
     def exec_cmd(self, cmd: str) -> fabric.runners.Result:
         """Execute the requested SSH command.
 
-        :param cmd: Command to run.
+        :param cmd: Command to execute.
         """
         return self.ssh.exec_cmd(cmd)
 
     def put(self, local: Union[Path, StringIO], remote: Path) -> None:
-        """Put a local file to the remote filesystem."""
+        """Put a local file to the remote filesystem.
+
+        :param local: Local file name.
+        :param remote: Remote file name.
+        """
         self.ssh.put(local.as_posix() if isinstance(local, Path) else local, remote.as_posix())
 
     def power_on(self, wait: bool = True, timeout: Optional[int] = 60) -> None:
         """Power on virtual machine.
 
-        :param wait: wait for system to come up or not
-        :param timeout: time to wait for system to become pingable
+        :param wait: Wait for host to come up or not.
+        :param timeout: Time to wait for host to come up.
         """
         if self.vmware:
             self.vmware.power_on(self.name)
             if wait:
                 self.wait2up(timeout=timeout)
         else:
-            raise ValueError(f"VMWare client not found for machine {self}")
+            raise ValueError(f"VMWare client not found for host {self}")
 
     def shutdown(self, wait: bool = True, timeout: Optional[int] = 60) -> None:
         """Shutdown virtual machine.
 
-        :param wait: wait for system to down or not
-        :param timeout: time to wait for system to become non-pingable (go down).
+        :param wait: Wait for the host go down or not.
+        :param timeout: Time to wait for the host to go down.
         """
         if self.vmware:
             self.vmware.power_off(self.name, wait_off=False)
@@ -116,6 +134,32 @@ class Server:
                 self.wait2down(timeout=timeout)
         else:
             raise ValueError(f"VMWare client not found for machine {self}")
+
+    def wait2up(self, timeout: int = 60) -> None:
+        """Wait for host to become accessible.
+
+        :param timeout: Time to wait for host to become accessible.
+        """
+        logger.info(f"Waiting for host {self} to go UP")
+        for index in range(timeout):
+            if self.is_up():
+                logger.info(f"{self} is UP after {index} seconds")
+                return
+            time.sleep(1)
+        raise TimeoutError(f"{self} is not UP after {timeout} seconds")
+
+    def wait2down(self, timeout: int = 30) -> None:
+        """Wait for host to become inaccessible.
+
+        :param timeout: Time to wait for host to become inaccessible.
+        """
+        logger.info(f"Waiting for host {self} to go DOWN")
+        for index in range(timeout):
+            if not self.is_up():
+                logger.info(f"{self} is DOWN after {index} seconds")
+                return
+            time.sleep(1)
+        raise TimeoutError(f"{self} is not DOWN after {timeout} seconds")
 
     def is_up(self) -> bool:
         """Ping to check if host is UP or not."""
@@ -130,38 +174,12 @@ class Server:
         logger.debug(f"{self} state is {'UP' if state else 'DOWN'}")
         return state
 
-    def wait2down(self, timeout: int = 30) -> None:
-        """Wait for timeout seconds for host to become non-pingable (go down).
-
-        :param timeout: wait for time in seconds
-        """
-        logger.info(f"Waiting for host {self} to go DOWN")
-        for _ in range(timeout):
-            if not self.is_up():
-                logger.info(f"{self} is DOWN")
-                return
-            time.sleep(1)
-
-        logger.exception(f"{self} did not went DOWN in {timeout} seconds")
-        raise TimeoutError(f"{self} did not went DOWN in {timeout} seconds")
-
-    def wait2up(self, timeout: int = 60) -> None:
-        """Wait for timeout seconds for host to become pingable [come up].
-
-        :param timeout: wait for time in seconds
-        """
-        logger.info(f"Waiting for host {self} to go UP")
-        for _ in range(timeout):
-            if self.is_up():
-                logger.info(f"{self} is UP")
-                return
-            time.sleep(1)
-
-        logger.exception(f"{self} did not went UP in {timeout} seconds")
-        raise TimeoutError(f"{self} did not went UP in {timeout} seconds")
-
     def reboot(self, wait: bool = True, timeout: Optional[int] = 60) -> None:
-        """Reboot a linux machine and wait for it to come up."""
+        """Reboot a linux machine and optionally wait for it to come up.
+
+        :param wait: Wait for host to come up or not.
+        :param timeout: Time to wait for host to become accessible.
+        """
         logger.info(f"Resetting {self}")
         if not self.is_up():
             self.power_on(wait, timeout)
@@ -174,7 +192,13 @@ class Server:
             self.wait_reboot(timeout)
 
     def wait_reboot(self, timeout: int = 60) -> None:
-        """Wait for reboot."""
+        """Wait for reboot.
+
+        As the reboot command can be VERY fast, we cannot rely on ping to determine if the host is accessible because it did
+        not reset yet, or because reset completed and the system is up and running back.
+
+        :param timeout: Time to wait for system to become accessible.
+        """
         for _ in range(timeout):
             try:
                 with Connection(
