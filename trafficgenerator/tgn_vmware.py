@@ -4,7 +4,7 @@ TrafficGenerator VMWare client classes and utilities.
 import logging
 import time
 from ipaddress import AddressValueError, IPv4Network
-from typing import Dict
+from typing import Dict, Optional
 
 from vmwc import Snapshot, VirtualMachine, VMWareClient
 
@@ -40,6 +40,10 @@ class VMWare(VMWareClient):
         if host not in VMWare.clients:
             VMWare.clients[host] = VMWare(host, username, password)
         return VMWare.clients[host]
+
+    def create_from_template(self, template: str, name: Optional[str]) -> str:
+        with VMWareClient(self.host, self.username, self.password) as client:
+            pass
 
     def power_on(self, ip_or_name: str, wait_on: bool = True, wait_vmware_tools: bool = False) -> None:
         """Power on specific machine."""
