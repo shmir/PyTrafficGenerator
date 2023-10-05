@@ -1,16 +1,33 @@
 """
 TrafficGenerator VMWare client classes and utilities.
 """
+import atexit
 import logging
 import time
 from ipaddress import AddressValueError, IPv4Network
 from typing import Dict, Optional
 
+from pyVim.connect import SmartConnect, Disconnect
+from pyVmomi import vim
 from vmwc import Snapshot, VirtualMachine, VMWareClient
 
 from trafficgenerator import TgnError
+from trafficgenerator import pchelper
 
 logger = logging.getLogger("tgn.trafficgenerator")
+
+
+def wait_for_task(task):
+    """ wait for a vCenter task to finish """
+    task_done = False
+    while not task_done:
+        if task.info.state == 'success':
+            return task.info.result
+
+        if task.info.state == 'error':
+            print("there was an error")
+            print(task.info.error)
+            task_done = True
 
 
 class TgnVMWareClientException(TgnError):
@@ -33,6 +50,9 @@ class VMWare(VMWareClient):
         self.host = host
         self.username = username
         self.password = password
+        service_instance = SmartConnect(host=self.host, user=self.username, pwd=self.password, disableSslCertValidation=True)
+        atexit.register(Disconnect, service_instance)
+        self.content = service_instance.RetrieveContent()
 
     @staticmethod
     def get_client(host: str, username: str, password: str) -> "VMWare":
@@ -41,9 +61,54 @@ class VMWare(VMWareClient):
             VMWare.clients[host] = VMWare(host, username, password)
         return VMWare.clients[host]
 
-    def create_from_template(self, template: str, name: Optional[str]) -> str:
+    def create_from_template(self, name: str, template_name: str, folder_name: str, datastore_name: str) -> list[str]:
+
+        template = pchelper.get_obj(self.content, [vim.VirtualMachine], template_name)
+        folder = pchelper.get_obj(self.content, [vim.Folder], folder_name)
+        datastore = pchelper.get_obj(self.content, [vim.Datastore], datastore_name)
+        resource_pool = pchelper.get_obj(self.content, [vim.ResourcePool], "Resources")
+
+        storagespec = vim.storageDrs.StoragePlacementSpec()
+        storagespec.type = 'create'
+        storagespec.folder = folder
+        storagespec.resourcePool = resource_pool
+
+        relo_spec = vim.vm.RelocateSpec()
+        relo_spec.datastore = datastore
+        relo_spec.pool = resource_pool
+
+        clone_spec = vim.vm.CloneSpec()
+        clone_spec.location = relo_spec
+        clone_spec.powerOn = False
+
+        task = template.Clone(folder=folder, name=name, spec=clone_spec)
+        wait_for_task(task)
+        self.power_on(name, wait_vmware_tools=True)
+
+        logger.info(f"Waiting for {name} VMWare IPs")
         with VMWareClient(self.host, self.username, self.password) as client:
-            pass
+            vm = [vm for vm in client.get_virtual_machines() if vm.name == name][0]
+            timeout = 64
+            ips = []
+            for index in range(timeout):
+                for net in vm._raw_virtual_machine.guest.net:  # pylint: disable=protected-access
+                    for vm_ip in net.ipAddress:
+                        ips.append(vm_ip)
+                    logger.info(f"IPs discovered after {index} seconds")
+                    return ips
+                time.sleep(1)
+        raise TgnVMWareClientException(f"Failed to discover IPs after {timeout} seconds")
+
+    def get_vms(self, folder_name: str = None) -> list[vim.VirtualMachine]:
+        folder = pchelper.get_obj(self.content, [vim.Folder], folder_name)
+        return [vm for vm in folder.childEntity if isinstance(vm, vim.VirtualMachine)]
+    def get_vm_events(self, folder_name: str, vm_name: str, events: Optional[list[str]] = None):
+        folder = pchelper.get_obj(self.content, [vim.Folder], folder_name)
+        vm = self.content.searchIndex.FindChild(folder, vm_name)
+
+        by_entity = vim.event.EventFilterSpec.ByEntity(entity=vm, recursion="self")
+        filter_spec = vim.event.EventFilterSpec(entity=by_entity, eventTypeId=events)
+        return self.content.eventManager.QueryEvent(filter_spec)
 
     def power_on(self, ip_or_name: str, wait_on: bool = True, wait_vmware_tools: bool = False) -> None:
         """Power on specific machine."""
@@ -58,6 +123,12 @@ class VMWare(VMWareClient):
         with VMWareClient(self.host, self.username, self.password) as client:
             vm = self._get_vm(client, ip_or_name)
             self._power_off(vm, wait_off)
+
+    def delete_vm(self, ip_or_name: str):
+        self.power_off(ip_or_name)
+        with VMWareClient(self.host, self.username, self.password) as client:
+            vm = self._get_vm(client, ip_or_name)
+            vm.delete()
 
     #
     # Private methods that assume VMWareClient is initialized (run within "with VMWareClient" clause).

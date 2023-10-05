@@ -1,0 +1,14 @@
+# Sample SUT for trafficgenerator testing.
+server:
+  name: Server name in VMWare - Optional.
+  ip: Server IP.
+  user: User with root privileges.
+  password: Password.
+# Optional.
+vmware:
+  ip: nl-srk03d-vc01.win.upclabs.com
+  user: WIN\yshamir
+  password: 5RDS9zmVa5Fyo2
+  folder: Quali VMs
+  template: ubuntu-client-imagev1
+  datastore: DA06_GOLD_SRK03D_STNT100_LaaS01

@@ -24,8 +24,9 @@ clean:
 
 install:
 	make clean
-	python -m pip install -U pip
-	pip install -U -r requirements.txt
+	python -m pip install -U --cert ~/cert.txt.cer pip
+	pip install -U --cert ~/cert.txt.cer --no-cache-dir git+https://github.com/vmware/vsphere-automation-sdk-python.git
+	pip install -U --cert ~/cert.txt.cer -r requirements.txt
 
 build:
 	make clean

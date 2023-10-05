@@ -13,9 +13,11 @@ from trafficgenerator.tgn_vmware import TgnVMWareClientException, VMWare
 
 pytestmark = pytest.mark.vmware
 
+TEST_VM = "test-vm"
+
 
 @pytest.fixture
-def machine(sut_utils: TgnTestSutUtils, vmware: TgnTestSutUtils) -> Iterable[Server]:
+def machine(sut_utils: TgnTestSutUtils) -> Iterable[Server]:
     """Yield Server object for testing."""
     machine = sut_utils.server()
     machine.power_on()
@@ -57,3 +59,18 @@ def test_negative(vmware: VMWare, machine: Server) -> None:
         vmware._wait_on(vm)
         with pytest.raises(TgnVMWareClientException):
             vmware._wait_vmware_tools(vm, timeout=0)
+
+
+def test_get_vms(vmware: VMWare, sut_utils: TgnTestSutUtils) -> None:
+    vm_ware_info = sut_utils.sut["vmware"]
+    vms = vmware.get_vms(vm_ware_info["folder"])
+    assert vms
+    for vm in [vm for vm in vms if not vm.config.template]:
+        assert vmware.get_vm_events(vm_ware_info["folder"], vm.name)
+
+
+def test_create_delete(vmware: VMWare, sut_utils: TgnTestSutUtils) -> None:
+    vm_ware_info = sut_utils.sut["vmware"]
+    ips = vmware.create_from_template(TEST_VM, vm_ware_info["template"], vm_ware_info["folder"], vm_ware_info["datastore"])
+    assert ips
+    vmware.delete_vm(TEST_VM)
