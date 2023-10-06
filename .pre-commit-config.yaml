@@ -1,15 +1,16 @@
+exclude: trafficgenerator/pchelper.py
 repos:
   - repo: https://github.com/timothycrosley/isort
-    rev: 5.11.2
+    rev: 5.11.5
     hooks:
       - id: isort
         language_version: python3.9
   - repo: https://github.com/python/black
-    rev: 22.12.0
+    rev: 23.3.0
     hooks:
       - id: black
         language_version: python3.9
-  - repo: https://gitlab.com/pycqa/flake8
+  - repo: https://github.com/PyCQA/flake8
     rev: 5.0.4
     hooks:
       - id: flake8
@@ -38,12 +39,12 @@ repos:
           --max-args=8,
           '--disable=logging-fstring-interpolation,logging-not-lazy,unspecified-encoding,too-few-public-methods,too-many-instance-attributes',
           '--good-names=ip,rc,eval,vm,ls',
-          '--load-plugins=pylint_pytest'
+          '--load-plugins=pylint_pytest',
         ]
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v0.991
+    rev: v1.2.0
     hooks:
     -   id: mypy
         verbose: true
         entry: bash -c 'mypy "$@" || true' --
-        additional_dependencies: [types-PyYAML, types-paramiko]
+        additional_dependencies: [types-PyYAML, types-paramiko, types-pyvmomi]

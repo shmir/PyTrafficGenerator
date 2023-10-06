@@ -7,27 +7,24 @@ import time
 from ipaddress import AddressValueError, IPv4Network
 from typing import Dict, Optional
 
-from pyVim.connect import SmartConnect, Disconnect
+from pyVim.connect import Disconnect, SmartConnect
 from pyVmomi import vim
 from vmwc import Snapshot, VirtualMachine, VMWareClient
 
-from trafficgenerator import TgnError
-from trafficgenerator import pchelper
+from trafficgenerator import TgnError, pchelper
 
 logger = logging.getLogger("tgn.trafficgenerator")
 
 
-def wait_for_task(task):
-    """ wait for a vCenter task to finish """
-    task_done = False
-    while not task_done:
-        if task.info.state == 'success':
+def wait_for_task(task, timeout: int = 60):
+    """Wait for a vCenter task to finish."""
+    logger.info(f"Waiting for task {task.info.name}")
+    for index in range(timeout):
+        logger.debug(f"Task {task.info.name} finished after {index} seconds")
+        if task.info.state == "success":
             return task.info.result
-
-        if task.info.state == 'error':
-            print("there was an error")
-            print(task.info.error)
-            task_done = True
+        time.sleep(1)
+    raise TgnVMWareClientException(f"Task {task.info.name} not finished after {timeout} seconds")
 
 
 class TgnVMWareClientException(TgnError):
@@ -62,14 +59,14 @@ class VMWare(VMWareClient):
         return VMWare.clients[host]
 
     def create_from_template(self, name: str, template_name: str, folder_name: str, datastore_name: str) -> list[str]:
-
+        """Create VM from template."""
         template = pchelper.get_obj(self.content, [vim.VirtualMachine], template_name)
         folder = pchelper.get_obj(self.content, [vim.Folder], folder_name)
         datastore = pchelper.get_obj(self.content, [vim.Datastore], datastore_name)
         resource_pool = pchelper.get_obj(self.content, [vim.ResourcePool], "Resources")
 
         storagespec = vim.storageDrs.StoragePlacementSpec()
-        storagespec.type = 'create'
+        storagespec.type = "create"
         storagespec.folder = folder
         storagespec.resourcePool = resource_pool
 
@@ -100,9 +97,12 @@ class VMWare(VMWareClient):
         raise TgnVMWareClientException(f"Failed to discover IPs after {timeout} seconds")
 
     def get_vms(self, folder_name: str = None) -> list[vim.VirtualMachine]:
+        """Get VMs list."""
         folder = pchelper.get_obj(self.content, [vim.Folder], folder_name)
         return [vm for vm in folder.childEntity if isinstance(vm, vim.VirtualMachine)]
+
     def get_vm_events(self, folder_name: str, vm_name: str, events: Optional[list[str]] = None):
+        """Get VM events."""
         folder = pchelper.get_obj(self.content, [vim.Folder], folder_name)
         vm = self.content.searchIndex.FindChild(folder, vm_name)
 
@@ -124,7 +124,8 @@ class VMWare(VMWareClient):
             vm = self._get_vm(client, ip_or_name)
             self._power_off(vm, wait_off)
 
-    def delete_vm(self, ip_or_name: str):
+    def delete_vm(self, ip_or_name: str) -> None:
+        """Delete the VM from the disk."""
         self.power_off(ip_or_name)
         with VMWareClient(self.host, self.username, self.password) as client:
             vm = self._get_vm(client, ip_or_name)

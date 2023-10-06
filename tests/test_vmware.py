@@ -62,6 +62,7 @@ def test_negative(vmware: VMWare, machine: Server) -> None:
 
 
 def test_get_vms(vmware: VMWare, sut_utils: TgnTestSutUtils) -> None:
+    """Test get VMs and events."""
     vm_ware_info = sut_utils.sut["vmware"]
     vms = vmware.get_vms(vm_ware_info["folder"])
     assert vms
@@ -70,6 +71,11 @@ def test_get_vms(vmware: VMWare, sut_utils: TgnTestSutUtils) -> None:
 
 
 def test_create_delete(vmware: VMWare, sut_utils: TgnTestSutUtils) -> None:
+    """
+    Test Create and delete VM.
+
+    :TODO: Build fixture to clean test VM.
+    """
     vm_ware_info = sut_utils.sut["vmware"]
     ips = vmware.create_from_template(TEST_VM, vm_ware_info["template"], vm_ware_info["folder"], vm_ware_info["datastore"])
     assert ips

@@ -7,8 +7,7 @@ import pyVmomi
 
 # Shamelessly borrowed from:
 # https://github.com/dnaeon/py-vconnector/blob/master/src/vconnector/core.py
-def collect_properties(si, view_ref, obj_type, path_set=None,
-                       include_mors=False):
+def collect_properties(si, view_ref, obj_type, path_set=None, include_mors=False):
     """
     Collect properties for managed objects from a view ref
 
@@ -39,8 +38,8 @@ def collect_properties(si, view_ref, obj_type, path_set=None,
 
     # Create a traversal specification to identify the path for collection
     traversal_spec = pyVmomi.vmodl.query.PropertyCollector.TraversalSpec()
-    traversal_spec.name = 'traverseEntities'
-    traversal_spec.path = 'view'
+    traversal_spec.name = "traverseEntities"
+    traversal_spec.path = "view"
     traversal_spec.skip = False
     traversal_spec.type = view_ref.__class__
     obj_spec.selectSet = [traversal_spec]
@@ -70,7 +69,7 @@ def collect_properties(si, view_ref, obj_type, path_set=None,
             properties[prop.name] = prop.val
 
         if include_mors:
-            properties['obj'] = obj.obj
+            properties["obj"] = obj.obj
 
         data.append(properties)
     return data
@@ -92,11 +91,7 @@ def get_container_view(si, obj_type, container=None):
     if not container:
         container = si.content.rootFolder
 
-    view_ref = si.content.viewManager.CreateContainerView(
-        container=container,
-        type=obj_type,
-        recursive=True
-    )
+    view_ref = si.content.viewManager.CreateContainerView(container=container, type=obj_type, recursive=True)
     return view_ref
 
 

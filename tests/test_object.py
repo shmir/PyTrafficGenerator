@@ -49,18 +49,12 @@ def tgn_object() -> Iterable[TgnTestObject]:
     tgn_object = TgnTestObject(parent=None, objRef="root1", objType="root")
     tgn_object.api = None
     tgn_object.logger = None
-    tgn_object.leaf1 = TgnTestObject(
-        objRef="leaf1", objType="leaf", parent=tgn_object)
-    tgn_object.node1 = TgnTestObject(
-        objRef="node1", objType="node", parent=tgn_object, name="name1")
-    tgn_object.node2 = TgnTestObject(
-        objRef="node2", objType="node", parent=tgn_object, name="name2")
-    tgn_object.node1.node11 = TgnTestObject(
-        objRef="node11", objType="node", parent=tgn_object.node1, name="name11")
-    tgn_object.node1.node12 = TgnTestObject(
-        objRef="node12", objType="node", parent=tgn_object.node1, name="name12")
-    tgn_object.node1.leaf11 = TgnTestObject(
-        objRef="leaf11", objType="leaf", parent=tgn_object.node1)
+    tgn_object.leaf1 = TgnTestObject(objRef="leaf1", objType="leaf", parent=tgn_object)
+    tgn_object.node1 = TgnTestObject(objRef="node1", objType="node", parent=tgn_object, name="name1")
+    tgn_object.node2 = TgnTestObject(objRef="node2", objType="node", parent=tgn_object, name="name2")
+    tgn_object.node1.node11 = TgnTestObject(objRef="node11", objType="node", parent=tgn_object.node1, name="name11")
+    tgn_object.node1.node12 = TgnTestObject(objRef="node12", objType="node", parent=tgn_object.node1, name="name12")
+    tgn_object.node1.leaf11 = TgnTestObject(objRef="leaf11", objType="leaf", parent=tgn_object.node1)
     yield tgn_object
 
 
@@ -96,8 +90,7 @@ def test_objects_tree(tgn_object: TgnTestObject) -> None:
 
     assert str(tgn_object) == tgn_object.name
 
-    assert len(tgn_object.get_objects_with_attribute(
-        obj_type="node", attribute="name", value="name1")) == 1
+    assert len(tgn_object.get_objects_with_attribute(obj_type="node", attribute="name", value="name1")) == 1
 
     assert len(tgn_object.get_children()) == 3
     assert tgn_object.get_child() == tgn_object.leaf1
