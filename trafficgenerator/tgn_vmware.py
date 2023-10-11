@@ -108,8 +108,8 @@ class VMWare(VMWareClient):
         folder = pchelper.get_obj(self.content, [vim.Folder], folder_name)
         vm = self.content.searchIndex.FindChild(folder, vm_name)
 
-        by_entity = vim.event.EventFilterSpec.ByEntity(entity=vm, recursion="self")
-        filter_spec = vim.event.EventFilterSpec(entity=by_entity, eventTypeId=events)
+        by_entity = vim.event.EventFilterSpec.ByEntity(entity=vm, recursion="self")  # type: ignore
+        filter_spec = vim.event.EventFilterSpec(entity=by_entity, eventTypeId=events)  # type: ignore
         return list(self.content.eventManager.QueryEvent(filter_spec))
 
     def power_on(self, ip_or_name: str, wait_on: bool = True, wait_vmware_tools: bool = False) -> None:
