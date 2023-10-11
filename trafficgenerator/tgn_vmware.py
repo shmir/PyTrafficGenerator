@@ -1,6 +1,7 @@
 """
 TrafficGenerator VMWare client classes and utilities.
 """
+# pylint: disable=c-extension-no-member
 import atexit
 import logging
 import time
@@ -16,13 +17,13 @@ from trafficgenerator import TgnError, pchelper
 logger = logging.getLogger("tgn.trafficgenerator")
 
 
-def wait_for_task(task, timeout: int = 60):
+def wait_for_task(task: vim.Task, timeout: int = 60) -> None:
     """Wait for a vCenter task to finish."""
     logger.info(f"Waiting for task {task.info.name}")
     for index in range(timeout):
         logger.debug(f"Task {task.info.name} finished after {index} seconds")
         if task.info.state == "success":
-            return task.info.result
+            return
         time.sleep(1)
     raise TgnVMWareClientException(f"Task {task.info.name} not finished after {timeout} seconds")
 
@@ -58,6 +59,7 @@ class VMWare(VMWareClient):
             VMWare.clients[host] = VMWare(host, username, password)
         return VMWare.clients[host]
 
+    # pylint: disable=too-many-locals
     def create_from_template(self, name: str, template_name: str, folder_name: str, datastore_name: str) -> list[str]:
         """Create VM from template."""
         template = pchelper.get_obj(self.content, [vim.VirtualMachine], template_name)
@@ -101,14 +103,14 @@ class VMWare(VMWareClient):
         folder = pchelper.get_obj(self.content, [vim.Folder], folder_name)
         return [vm for vm in folder.childEntity if isinstance(vm, vim.VirtualMachine)]
 
-    def get_vm_events(self, folder_name: str, vm_name: str, events: Optional[list[str]] = None):
+    def get_vm_events(self, folder_name: str, vm_name: str, events: Optional[list[str]] = None) -> list[vim.event.EventEx]:
         """Get VM events."""
         folder = pchelper.get_obj(self.content, [vim.Folder], folder_name)
         vm = self.content.searchIndex.FindChild(folder, vm_name)
 
         by_entity = vim.event.EventFilterSpec.ByEntity(entity=vm, recursion="self")
         filter_spec = vim.event.EventFilterSpec(entity=by_entity, eventTypeId=events)
-        return self.content.eventManager.QueryEvent(filter_spec)
+        return list(self.content.eventManager.QueryEvent(filter_spec))
 
     def power_on(self, ip_or_name: str, wait_on: bool = True, wait_vmware_tools: bool = False) -> None:
         """Power on specific machine."""
