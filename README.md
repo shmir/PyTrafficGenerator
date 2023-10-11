@@ -8,17 +8,19 @@ The package provides
 - Common utilities.
 - Base class for all Python OO traffic generator classes.
 - Base Python wrapper over Tcl - the lowest common denominator API for TGNs is Tcl (also the inheriting packages still have some legacy code implemented in Tcl).
+- Base classes for server management and VMWare.
 
 Users
------
-To install pytrafficgen for users, just pip install it::
-
-    $ pip install pytrafficgen
+---
+To install pytrafficgen for users, just pip install it
+```bash
+pip install pytrafficgen
+pip install git+https://github.com/vmware/vsphere-automation-sdk-python.git
+```
 
 Developers
 ----------
 To get pytrafficgen for developers, just clone it
-
 ```bash
 $ git clone https://github.com/shmir/PyTrafficGenerator.git
 ```
