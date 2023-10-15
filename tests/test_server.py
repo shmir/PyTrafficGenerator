@@ -7,21 +7,24 @@ from typing import Iterable
 
 import pytest
 from invoke.exceptions import UnexpectedExit
+from pyVmomi import vim
 
 from tests import TgnTestSutUtils
 from trafficgenerator.tgn_server import Server
+from trafficgenerator.tgn_vmware import VMWare
 
 pytestmark = pytest.mark.vmware
 
 
 @pytest.fixture
-def server(sut_utils: TgnTestSutUtils, vmware: TgnTestSutUtils) -> Iterable[Server]:
+def server(vmware: VMWare, vm: vim.VirtualMachine, sut_utils: TgnTestSutUtils) -> Iterable[Server]:
     """Yield Server object for testing."""
-    server = sut_utils.server()
+    server = sut_utils.sut["server"]
     server.power_on()
     yield server
     # Some tests (like negative) change the server object, so re-build it and power on the server.
-    sut_utils.server().power_on()
+    server = sut_utils.sut["server"]
+    server.power_on()
 
 
 def test_exec_cmd(server: Server) -> None:

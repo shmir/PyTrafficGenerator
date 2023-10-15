@@ -60,7 +60,7 @@ class VMWare(VMWareClient):
         return VMWare.clients[host]
 
     # pylint: disable=too-many-locals
-    def create_from_template(self, name: str, template_name: str, folder_name: str, datastore_name: str) -> list[str]:
+    def create_from_template(self, name: str, template_name: str, folder_name: str, datastore_name: str) -> vim.VirtualMachine:
         """Create VM from template."""
         template = pchelper.get_obj(self.content, [vim.VirtualMachine], template_name)
         folder = pchelper.get_obj(self.content, [vim.Folder], folder_name)
@@ -85,23 +85,37 @@ class VMWare(VMWareClient):
         self.power_on(name, wait_vmware_tools=True)
 
         logger.info(f"Waiting for {name} VMWare IPs")
-        with VMWareClient(self.host, self.username, self.password) as client:
-            vm = [vm for vm in client.get_virtual_machines() if vm.name == name][0]
-            timeout = 64
-            ips = []
-            for index in range(timeout):
-                for net in vm._raw_virtual_machine.guest.net:  # pylint: disable=protected-access
-                    for vm_ip in net.ipAddress:
-                        ips.append(vm_ip)
-                    logger.info(f"IPs discovered after {index} seconds")
-                    return ips
-                time.sleep(1)
+        timeout = 64
+        vm = self.get_vm(folder_name, name)
+        for index in range(timeout):
+            if list(vm.guest.net):
+                logger.info(f"IPs discovered after {index} seconds")
+                return vm
+            time.sleep(1)
         raise TgnVMWareClientException(f"Failed to discover IPs after {timeout} seconds")
 
-    def get_vms(self, folder_name: str = None) -> list[vim.VirtualMachine]:
-        """Get VMs list."""
+    def delete_vm(self, folder_name: str, name: str) -> None:
+        """Delete the VM from the disk."""
+        vm = self.get_vm(folder_name, name)
+        if not vm:
+            return
+        self.power_off(vm.name)
+        task = vm.Destroy()
+        wait_for_task(task)
+
+    def get_vms(self, folder_name: str) -> list[vim.VirtualMachine]:
+        """Get VMs list.
+
+        :TODO: Folder name should be optional, default is starting from the root folder.
+        :TODO: Read from sub-folders.
+        """
         folder = pchelper.get_obj(self.content, [vim.Folder], folder_name)
         return [vm for vm in folder.childEntity if isinstance(vm, vim.VirtualMachine)]
+
+    def get_vm(self, folder_name: str, name: str) -> Optional[vim.VirtualMachine]:
+        """Get VM."""
+        vms = [vm for vm in self.get_vms(folder_name) if vm.name == name]
+        return vms[0] if vms else None
 
     def get_vm_events(self, folder_name: str, vm_name: str, events: Optional[list[str]] = None) -> list[vim.event.EventEx]:
         """Get VM events."""
@@ -125,13 +139,6 @@ class VMWare(VMWareClient):
         with VMWareClient(self.host, self.username, self.password) as client:
             vm = self._get_vm(client, ip_or_name)
             self._power_off(vm, wait_off)
-
-    def delete_vm(self, ip_or_name: str) -> None:
-        """Delete the VM from the disk."""
-        self.power_off(ip_or_name)
-        with VMWareClient(self.host, self.username, self.password) as client:
-            vm = self._get_vm(client, ip_or_name)
-            vm.delete()
 
     #
     # Private methods that assume VMWareClient is initialized (run within "with VMWareClient" clause).
