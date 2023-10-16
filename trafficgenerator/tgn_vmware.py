@@ -62,6 +62,8 @@ class VMWare(VMWareClient):
     # pylint: disable=too-many-locals
     def create_from_template(self, name: str, template_name: str, folder_name: str, datastore_name: str) -> vim.VirtualMachine:
         """Create VM from template."""
+        if self.get_vm(folder_name, name):
+            raise TgnVMWareClientException(f"VM {folder_name}/{name} already exists")
         template = pchelper.get_obj(self.content, [vim.VirtualMachine], template_name)
         folder = pchelper.get_obj(self.content, [vim.Folder], folder_name)
         datastore = pchelper.get_obj(self.content, [vim.Datastore], datastore_name)

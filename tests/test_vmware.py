@@ -15,6 +15,15 @@ pytestmark = pytest.mark.vmware
 
 
 @pytest.fixture
+def vm(vmware: VMWare, sut_utils: TgnTestSutUtils) -> Iterable[vim.VirtualMachine]:
+    """Yield VM for testing."""
+    vm_ware_info = sut_utils.sut["vmware"]
+    vm_ = vmware.create_from_template(TEST_VM, vm_ware_info["template"], vm_ware_info["folder"], vm_ware_info["datastore"])
+    yield vm_
+    vmware.delete_vm(vm_ware_info["folder"], vm_.name)
+
+
+@pytest.fixture
 def clean_vm(vmware: VMWare, sut_utils: TgnTestSutUtils) -> Iterable[None]:
     """Clean VM after testing."""
     vm_ware_info = sut_utils.sut["vmware"]

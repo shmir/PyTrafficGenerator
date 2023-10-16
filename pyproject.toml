@@ -11,6 +11,9 @@ profile = "black"
 [tool.black]
 line-length = 127
 
+[tool.pylint]
+c-extension-no-member = "false"
+
 [tool.pytest.ini_options]
 markers = [
     "vmware: marks tests as require VMWare (deselect with '-m \"not vmware\"')"

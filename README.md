@@ -23,6 +23,19 @@ Developers
 To get pytrafficgen for developers, just clone it
 ```bash
 $ git clone https://github.com/shmir/PyTrafficGenerator.git
+$ make install
+```
+
+Testing
+----------
+For basic testing without testing VMware and Server. 
+```bash
+$ pytest -m "not vmware" 
+```
+For basic testing without testing VMWare and Server.
+First edit/copy the SUT configuration file under `tests/test_sut.yaml`, and then run: 
+```bash
+$ pytest -s --tgn-sut=/path/to/yaml/file 
 ```
 
 To upload a new version to local pypi:

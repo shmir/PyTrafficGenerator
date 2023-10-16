@@ -25,6 +25,7 @@ clean:
 install:
 	make clean
 	python -m pip install -U pip
+	pip install -U git+https://github.com/vmware/vsphere-automation-sdk-python.git
 	pip install -U -r requirements.txt
 
 build:

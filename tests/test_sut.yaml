@@ -9,3 +9,6 @@ vmware:
   ip: VMWare/ESXi IP address.
   user: User.
   password: Password.
+  folder: Folder with write permissions
+  template: Template to use for VM cloning.
+  datastore: Datastore for VM.

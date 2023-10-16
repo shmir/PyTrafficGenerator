@@ -1,7 +1,7 @@
 """
 Test server module.
 """
-# pylint: disable=redefined-outer-name
+# pylint: disable=redefined-outer-name, c-extension-no-member
 from pathlib import Path
 from typing import Iterable
 
@@ -9,22 +9,34 @@ import pytest
 from invoke.exceptions import UnexpectedExit
 from pyVmomi import vim
 
-from tests import TgnTestSutUtils
+from tests import TEST_VM, TgnTestSutUtils
 from trafficgenerator.tgn_server import Server
 from trafficgenerator.tgn_vmware import VMWare
 
 pytestmark = pytest.mark.vmware
 
 
+@pytest.fixture(scope="module")
+def vm(vmware: VMWare, sut_utils: TgnTestSutUtils) -> Iterable[vim.VirtualMachine]:
+    """Yield VM for testing."""
+    vm_ware_info = sut_utils.sut["vmware"]
+    vm = vmware.get_vm(vm_ware_info["folder"], TEST_VM)
+    if not vm:
+        vm = vmware.create_from_template(TEST_VM, vm_ware_info["template"], vm_ware_info["folder"], vm_ware_info["datastore"])
+    yield vm
+    vmware.delete_vm(vm_ware_info["folder"], vm.name)
+
+
 @pytest.fixture
 def server(vmware: VMWare, vm: vim.VirtualMachine, sut_utils: TgnTestSutUtils) -> Iterable[Server]:
     """Yield Server object for testing."""
-    server = sut_utils.sut["server"]
-    server.power_on()
+    server_info = sut_utils.sut["server"]
+    server = Server(vm.name, vm.guest.ipAddress, server_info["user"], server_info["password"], vmware)
+    server.power_on(wait=False)
     yield server
     # Some tests (like negative) change the server object, so re-build it and power on the server.
     server = sut_utils.sut["server"]
-    server.power_on()
+    server.power_on(wait=False)
 
 
 def test_exec_cmd(server: Server) -> None:
