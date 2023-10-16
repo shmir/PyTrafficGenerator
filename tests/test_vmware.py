@@ -3,7 +3,6 @@ Test VMWare operations.
 """
 from typing import Iterable
 
-# pylint: disable=redefined-outer-name
 import pytest
 from pyVmomi import vim
 
@@ -44,6 +43,6 @@ def test_get_vms(vmware: VMWare, vm: vim.VirtualMachine, sut_utils: TgnTestSutUt
 def test_create_delete(vmware: VMWare, sut_utils: TgnTestSutUtils) -> None:
     """Test Create and delete VM."""
     vm_ware_info = sut_utils.sut["vmware"]
-    vm = vmware.create_from_template(TEST_VM, vm_ware_info["template"], vm_ware_info["folder"], vm_ware_info["datastore"])
-    assert vm
-    vmware.delete_vm(vm_ware_info["folder"], vm.name)
+    vm_ = vmware.create_from_template(TEST_VM, vm_ware_info["template"], vm_ware_info["folder"], vm_ware_info["datastore"])
+    assert vm_
+    vmware.delete_vm(vm_ware_info["folder"], vm_.name)
