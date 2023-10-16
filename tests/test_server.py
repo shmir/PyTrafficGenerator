@@ -1,7 +1,7 @@
 """
 Test server module.
 """
-# pylint: disable=redefined-outer-name, c-extension-no-member
+# pylint: disable=redefined-outer-name
 from pathlib import Path
 from typing import Iterable
 
